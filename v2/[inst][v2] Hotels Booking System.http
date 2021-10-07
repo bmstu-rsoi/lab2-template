@@ -94,25 +94,26 @@ POST {{baseUrl}}/api/v1/reservation
 X-User-Name: {{username}}
 Content-Type: application/json
 # REQUEST
-#{
-#  "hotel_uid": "string",
-#  "start_date": "datetime",
-#  "end_date": "datetime",
-#  "price": "number"
-#}
-
 {
-  "reservation_uid": "string",
   "hotel_uid": "string",
   "start_date": "datetime",
   "end_date": "datetime",
-  "discount": "number",
-  "status": "string",
-  "payment": {
-    "status": "string",
-    "price": "number"
-  }
+  "price": "number"
 }
+
+# RESPONSE
+#{
+#  "reservation_uid": "string",
+#  "hotel_uid": "string",
+#  "start_date": "datetime",
+#  "end_date": "datetime",
+#  "discount": "number",
+#  "status": "string",
+#  "payment": {
+#    "status": "string",
+#    "price": "number"
+#  }
+#}
 
 ### Отменить бронирование
 DELETE {{baseUrl}}/api/v1/reservation/{{reservationUid}}

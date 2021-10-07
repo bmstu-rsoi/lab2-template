@@ -25,12 +25,9 @@
 ### Пояснения
 
 1. Для локальной разработки можно использовать Postgres в docker, для этого нужно запустить docker compose up -d,
-   поднимется контейнер с Postgres 13, будет создана БД `services` и пользователь `program`:`test`.
-
-   Для создания схем нужно прописать в [20-create-schemas.sh](postgres/20-create-schemas.sh):
-   ```
-   CREATE SCHEMA IF NOT EXISTS <schema-name>;
-   ```
+   поднимется контейнер с Postgres 13, будет создана БД `services` и пользователь `program`:`test`. Для создания схем
+   нужно прописать в [20-create-schemas.sh](postgres/20-create-schemas.sh) свой вариант задания в переменную `VARIANT`.
+   После поднятия контейнера будут созданы схемы, описанные в файлах [schema-$VARIANT](postgres/schemes) по вариантам.
 1. Горизонтальную коммуникацию между сервисами делать нельзя. Предположим, у нас сервисы `UserService`, `OrderService`,
    `WarehouseService` и `Gateway`:
     * На `Gateway` от пользователя `Alex` приходит запрос `Купить товар с productName: 'Lego Technic 42129`.

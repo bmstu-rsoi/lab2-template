@@ -1,0 +1,92 @@
+### Получить список всех доступных автомобилей
+GET {{baseUrl}}/api/v1/cars
+Content-Type: application/json
+
+{
+  "car_uid": "string",
+  "brand": "string",
+  "model": "string",
+  "registration_number": "string",
+  "power": "number",
+  "type": "string",
+  "price": "number"
+}
+
+### Получить информацию об аренде пользователя
+GET {{baseUrl}}/api/v1/rental
+X-User-Name: {{username}}
+Content-Type: application/json
+
+[
+  {
+    "rental_uid": "string",
+    "status": "string",
+    "date_from": "datetime",
+    "date_to": "datetime",
+    "car": {
+      "brand": "string",
+      "model": "string",
+      "registration_number": "string"
+    },
+    "payment": {
+      "payment_uid": "string",
+      "status": "string",
+      "price": "number"
+    }
+  }
+]
+
+### Получить информацию о конкретной аренде
+GET {{baseUrl}}/api/v1/rental/{{rentalUid}}
+X-User-Name: {{username}}
+Content-Type: application/json
+
+[
+  {
+    "rental_uid": "string",
+    "status": "string",
+    "date_from": "datetime",
+    "date_to": "datetime",
+    "car": {
+      "brand": "string",
+      "model": "string",
+      "registration_number": "string"
+    },
+    "payment": {
+      "payment_uid": "string",
+      "status": "string",
+      "price": "number"
+    }
+  }
+]
+
+### Забронировать автомобиль
+POST {{baseUrl}}/api/v1/rental
+X-User-Name: {{username}}
+Content-Type: application/json
+# REQUEST
+{
+  "car_uid": "string",
+  "date_from": "datetime",
+  "date_to": "datetime",
+  "price": "number"
+}
+
+# RESPONSE
+#{
+#  "rental_uid": "string",
+#  "status": "string",
+#  "date_from": "datetime",
+#  "date_to": "datetime",
+#  "car_uid": "string",
+#  "payment": {
+#    "payment_uid": "string",
+#    "status": "string",
+#    "price": "number"
+#  }
+#}
+
+### Отменить бронирование
+DELETE {{baseUrl}}/api/v1/rental/{{rentalUid}}
+X-User-Name: {{username}}
+Content-Type: application/json

@@ -9,10 +9,15 @@
 ```sql
 CREATE TABLE reservation
 (
-    id        SERIAL PRIMARY KEY,
-    username  VARCHAR(80) NOT NULL,
-    book_uid  uuid        NOT NULL,
-    till_date TIMESTAMP   NOT NULL
+    id              SERIAL PRIMARY KEY,
+    reservation_uid uuid UNIQUE NOT NULL,
+    username        VARCHAR(80) NOT NULL,
+    book_uid        uuid        NOT NULL,
+    library_uid     uuid        NOT NULL,
+    status          VARCHAR(20) NOT NULL
+        CHECK (status IN ('RENTED', 'RETURNED', 'EXPIRED', 'LOST')),
+    start_date      TIMESTAMP   NOT NULL,
+    till_date       TIMESTAMP   NOT NULL
 )
 ```
 
@@ -21,29 +26,28 @@ CREATE TABLE reservation
 ```sql
 CREATE TABLE library
 (
-    id      SERIAL PRIMARY KEY,
-    name    VARCHAR(80)  NOT NULL,
-    address VARCHAR(255) NOT NULL
+    id          SERIAL PRIMARY KEY,
+    library_uid uuid UNIQUE  NOT NULL,
+    name        VARCHAR(80)  NOT NULL,
+    city        VARCHAR(255) NOT NULL,
+    address     VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE books
 (
-    id     SERIAL PRIMARY KEY,
-    name   VARCHAR(255) NOT NULL,
-    author VARCHAR(255),
-    genre  VARCHAR(255)
+    id        SERIAL PRIMARY KEY,
+    book_uid  uuid UNIQUE  NOT NULL,
+    name      VARCHAR(255) NOT NULL,
+    author    VARCHAR(255),
+    genre     VARCHAR(255),
+    condition VARCHAR(20) DEFAULT 'EXCELLENT'
+        CHECK (condition IN ('EXCELLENT', 'GOOD', 'BAD'))
 );
 
 CREATE TABLE library_books
 (
-    id         SERIAL PRIMARY KEY,
-    book_uid   uuid NOT NULL,
-    book_id    INT  NOT NULL
-        REFERENCES books (id),
-    library_id INT  NOT NULL
-        REFERENCES library (id),
-    condition  VARCHAR(20) DEFAULT 'EXCELLENT'
-        CHECK (condition IN ('EXCELLENT', 'GOOD', 'BAD'))
+    book_id    INT REFERENCES books (id),
+    library_id INT REFERENCES library (id)
 );
 ```
 

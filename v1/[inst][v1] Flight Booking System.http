@@ -68,12 +68,13 @@ POST {{baseUrl}}/api/v1/tickets
 X-User-Name: {{username}}
 Content-Type: application/json
 # REQUEST
-#{
-#  "flight_number": "string",
-#  "date": "datetime",
-#  "price": "number",
-#  "paid_from_balance": "boolean"
-#}
+{
+  "flight_number": "string",
+  "date": "datetime",
+  "price": "number",
+  "paid_from_balance": "boolean"
+}
+
 # RESPONSE
 #{
 #  "ticket_uid": "uuid",
