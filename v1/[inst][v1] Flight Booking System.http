@@ -1,0 +1,112 @@
+### Список рейсов
+GET {{baseUrl}}/api/v1/fights
+Content-Type: application/json
+
+[
+  {
+    "from_airport": "country + name",
+    "to_airport": "country + name",
+    "date": "datetime",
+    "price": "number"
+  }
+]
+
+### Информация о пользователе
+GET {{baseUrl}}/api/v1/me/
+X-User-Name: {{username}}
+Content-Type: application/json
+
+{
+  "tickets": [
+    {
+      "ticket_uid": "uuid",
+      "flight_number": "string",
+      "from_airport": "country + name",
+      "to_airport": "country + name",
+      "date": "datetime",
+      "price": "number"
+    }
+  ],
+  "privilege": {
+    "balance": "number",
+    "status": "string"
+  }
+}
+
+### Информация по всем билетам пользователя
+GET {{baseUrl}}/api/v1/tickets
+X-User-Name: {{username}}
+Content-Type: application/json
+
+[
+  {
+    "ticket_uid": "uuid",
+    "flight_number": "string",
+    "from_airport": "country + name",
+    "to_airport": "country + name",
+    "date": "datetime",
+    "price": "number"
+  }
+]
+
+### Информация по конкретному билету пользователя
+GET {{baseUrl}}/api/v1/tickets/{{tikcetUid}}
+X-User-Name: {{username}}
+Content-Type: application/json
+
+{
+  "ticket_uid": "uuid",
+  "flight_number": "string",
+  "from_airport": "country + name",
+  "to_airport": "country + name",
+  "date": "datetime",
+  "price": "number"
+}
+
+### Купить билет
+POST {{baseUrl}}/api/v1/tickets
+X-User-Name: {{username}}
+Content-Type: application/json
+# REQUEST
+#{
+#  "flight_number": "string",
+#  "date": "datetime",
+#  "price": "number",
+#  "paid_from_balance": "boolean"
+#}
+# RESPONSE
+#{
+#  "ticket_uid": "uuid",
+#  "flight_number": "string",
+#  "from_airport": "country + name",
+#  "to_airport": "country + name",
+#  "date": "datetime",
+#  "paid_by_money": "number",
+#  "paid_by_bonuses": "number",
+#  "privilege": {
+#    "balance": "number",
+#    "status": "string"
+#  }
+#}
+
+### Вернуть билет
+DELETE {{baseUrl}}/api/v1/tickets/{{ticketUid}}
+X-User-Name: {{username}}
+Content-Type: application/json
+
+### Получить историю бонусного счета
+GET {{baseUrl}}/api/v1/privilege
+X-User-Name: {{username}}
+Content-Type: application/json
+
+{
+  "balance": "number",
+  "status": "string",
+  "history": [
+    {
+      "date": "datetime",
+      "balance_diff": "number",
+      "operation_type": "string"
+    }
+  ]
+}

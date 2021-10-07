@@ -1,0 +1,130 @@
+### Список отелей
+GET {{baseUrl}}/api/v1/hotels
+Content-Type: application/json
+
+[
+  {
+    "hotel_uid": "string",
+    "name": "string",
+    "country": "string",
+    "city": "string",
+    "address": "string",
+    "stars": "number"
+  }
+]
+
+### Информация о пользователе
+GET {{baseUrl}}/api/v1/me/
+X-User-Name: {{username}}
+Content-Type: application/json
+
+{
+  "reservations": [
+    {
+      "reservation_uid": "string",
+      "hotel": {
+        "hotel_uid": "string",
+        "name": "string",
+        "fullAddress": "string",
+        "stars": "number"
+      },
+      "start_date": "datetime",
+      "end_date": "datetime",
+      "status": "string",
+      "payment": {
+        "status": "string",
+        "price": "number"
+      }
+    }
+  ],
+  "loyalty": {
+    "status": "string",
+    "discount": "number"
+  }
+}
+
+### Информация по всем бронированиям пользователя
+GET {{baseUrl}}/api/v1/reservation
+X-User-Name: {{username}}
+Content-Type: application/json
+
+[
+  {
+    "reservation_uid": "string",
+    "hotel": {
+      "hotel_uid": "string",
+      "name": "string",
+      "fullAddress": "string",
+      "stars": "number"
+    },
+    "start_date": "datetime",
+    "end_date": "datetime",
+    "status": "string",
+    "payment": {
+      "status": "string",
+      "price": "number"
+    }
+  }
+]
+
+### Информация по конкретному бронированию пользователя
+GET {{baseUrl}}/api/v1/reservation/{{reservationUid}}
+X-User-Name: {{username}}
+Content-Type: application/json
+
+{
+  "reservation_uid": "string",
+  "hotel": {
+    "hotel_uid": "string",
+    "name": "string",
+    "fullAddress": "string",
+    "stars": "number"
+  },
+  "start_date": "datetime",
+  "end_date": "datetime",
+  "status": "string",
+  "payment": {
+    "status": "string",
+    "price": "number"
+  }
+}
+
+### Забронировать отель
+POST {{baseUrl}}/api/v1/reservation
+X-User-Name: {{username}}
+Content-Type: application/json
+# REQUEST
+#{
+#  "hotel_uid": "string",
+#  "start_date": "datetime",
+#  "end_date": "datetime",
+#  "price": "number"
+#}
+
+{
+  "reservation_uid": "string",
+  "hotel_uid": "string",
+  "start_date": "datetime",
+  "end_date": "datetime",
+  "discount": "number",
+  "status": "string",
+  "payment": {
+    "status": "string",
+    "price": "number"
+  }
+}
+
+### Отменить бронирование
+DELETE {{baseUrl}}/api/v1/reservation/{{reservationUid}}
+X-User-Name: {{username}}
+Content-Type: application/json
+
+### Получить информацию по статусу лояльности
+GET {{baseUrl}}/api/v1/loyality
+X-User-Name: {{username}}
+Content-Type: application/json
+
+{
+  "status": "string",
+  "discount": "number"
+}
