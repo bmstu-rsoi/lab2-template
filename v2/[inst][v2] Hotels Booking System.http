@@ -9,7 +9,8 @@ Content-Type: application/json
     "country": "string",
     "city": "string",
     "address": "string",
-    "stars": "number"
+    "stars": "number",
+    "price": "number"
   }
 ]
 

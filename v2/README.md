@@ -27,7 +27,8 @@ CREATE TABLE hotels
     country   VARCHAR(80)  NOT NULL,
     city      VARCHAR(80)  NOT NULL,
     address   VARCHAR(255) NOT NULL,
-    stars     INT
+    stars     INT,
+    price     INT          NOT NULL
 );
 ```
 
