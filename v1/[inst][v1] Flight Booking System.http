@@ -6,6 +6,7 @@ Content-Type: application/json
   {
     "from_airport": "country + name",
     "to_airport": "country + name",
+    "flight_number": "string",
     "date": "datetime",
     "price": "number"
   }
@@ -76,19 +77,19 @@ Content-Type: application/json
 }
 
 # RESPONSE
-#{
-#  "ticket_uid": "uuid",
-#  "flight_number": "string",
-#  "from_airport": "country + name",
-#  "to_airport": "country + name",
-#  "date": "datetime",
-#  "paid_by_money": "number",
-#  "paid_by_bonuses": "number",
-#  "privilege": {
-#    "balance": "number",
-#    "status": "string"
-#  }
-#}
+{
+  "ticket_uid": "uuid",
+  "flight_number": "string",
+  "from_airport": "country + name",
+  "to_airport": "country + name",
+  "date": "datetime",
+  "paid_by_money": "number",
+  "paid_by_bonuses": "number",
+  "privilege": {
+    "balance": "number",
+    "status": "string"
+  }
+}
 
 ### Вернуть билет
 DELETE {{baseUrl}}/api/v1/tickets/{{ticketUid}}
