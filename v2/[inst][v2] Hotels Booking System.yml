@@ -40,7 +40,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserInfoResponse"
 
-  /api/v1/reservation:
+  /api/v1/reservations:
     get:
       summary: Информация по всем бронированиям пользователя
       tags:
@@ -92,7 +92,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ValidationErrorResponse"
 
-  /api/v1/reservation/{reservationUid}:
+  /api/v1/reservations/{reservationUid}:
     get:
       summary: Информация по конректному бронированию
       tags:

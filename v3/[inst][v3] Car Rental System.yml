@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Hotels Booking System
+  title: Car Rental System
   version: "1.0"
 servers:
   - url: http://localhost:8080

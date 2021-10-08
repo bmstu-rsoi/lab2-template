@@ -1,0 +1,414 @@
+openapi: 3.0.1
+info:
+  title: Library System
+  version: "1.0"
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/libraries:
+    get:
+      summary: Получить список библиотек в городе
+      tags:
+        - Gateway API
+      parameters:
+        - name: city
+          in: query
+          required: true
+          description: Город
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Список библиотек в городе
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LibraryResponse"
+
+  /api/v1/libraries/{libraryUid}/books:
+    get:
+      summary: Получить список книг в выбранной библиотеке
+      tags:
+        - Gateway API
+      parameters:
+        - name: libraryUid
+          in: path
+          required: true
+          description: UUID библиотеки
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Список книг библиотеке
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LibraryBookResponse"
+
+  /api/v1/reservations:
+    get:
+      summary: Получить информацию по всем взятым в прокат книгам
+      tags:
+        - Gateway API
+      parameters:
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Информация по всем взятым в прокат книгам
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookReservationResponse"
+
+    post:
+      summary: Взять книгу в библиотеке
+      tags:
+        - Gateway API
+      parameters:
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TakeBookRequest"
+      responses:
+        "200":
+          description: Информация о бронировании
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TakeBookResponse"
+        "400":
+          description: Ошибка валидации данных
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+
+  /api/v1/reservations/{reservationUid}/return:
+    post:
+      summary: Вернуть книгу
+      tags:
+        - Gateway API
+      parameters:
+        - name: reservationUid
+          in: path
+          description: UUID бронирования
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReturnBookResponse"
+      responses:
+        "204":
+          description: Книга успешно возвращена
+        "404":
+          description: Билет не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/rating:
+    get:
+      summary: Получить рейтинг пользователя
+      tags:
+        - Gateway API
+      parameters:
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Рейтинг пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserRatingResponse"
+
+components:
+  schemas:
+    LibraryResponse:
+      type: object
+      example:
+        {
+          library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+          name: "Библиотека имени 7 Непьющих",
+          address: "2-я Бауманская ул., д.5, стр.1",
+          city: "Москва"
+        }
+      properties:
+        library_uid:
+          type: string
+          description: UUID библиотеки
+          format: uuid
+        name:
+          type: string
+          description: Название библиотеки
+        address:
+          type: string
+          description: Адрес библиотеки
+        city:
+          type: string
+          description: Город, в котором находится библиотека
+
+    LibraryBookResponse:
+      type: object
+      example:
+        {
+          book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+          name: "Краткий курс C++ в 7 томах",
+          author: "Бьерн Страуструп",
+          genre: "Научная фантастика",
+          condition: "EXCELLENT"
+        }
+      properties:
+        book_uuid:
+          type: string
+          description: UUID книги
+          format: uuid
+        name:
+          type: string
+          description: Название книги
+        author:
+          type: string
+          description: Автор
+        genre:
+          type: string
+          description: Жанр
+        condition:
+          type: string
+          description: Состояние книги
+          enum:
+            - EXCELLENT
+            - GOOD
+            - BAD
+
+    BookReservationResponse:
+      type: object
+      example:
+        {
+          reservation_uid: "f464ca3a-fcf7-4e3f-86f0-76c7bba96f72",
+          status: "RENTED",
+          start_date: "2021-10-09",
+          till_date: "2021-10-11",
+          book: {
+            book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+            name: "Краткий курс C++ в 7 томах",
+            author: "Бьерн Страуструп",
+            genre: "Научная фантастика",
+          },
+          library: {
+            library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+            name: "Библиотека имени 7 Непьющих",
+            address: "2-я Бауманская ул., д.5, стр.1",
+            city: "Москва"
+          }
+        }
+      properties:
+        reservation_uid:
+          type: string
+          description: UUID бронирования
+          format: uuid
+        status:
+          type: string
+          description: Статус бронирования книги
+          enum:
+            - RENTED
+            - RETURNED
+            - EXPIRED
+            - LOST
+        start_date:
+          type: string
+          description: Дата начала бронирования
+          format: ISO 8601
+        till_date:
+          type: string
+          description: Дата окончания бронирования
+          format: ISO 8601
+        book:
+          $ref: "#/components/schemas/BookInfo"
+        library:
+          $ref: "#/components/schemas/LibraryResponse"
+
+    TakeBookRequest:
+      type: object
+      example:
+        {
+          book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+          library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+          till_date: "2021-10-11"
+        }
+      properties:
+        book_uuid:
+          type: string
+          description: UUID книги
+          format: uuid
+        library_uuid:
+          type: string
+          description: UUID библиотеки
+          format: uuid
+        till_date:
+          type: string
+          description: Дата окончания бронирования
+          format: ISO 8601
+
+    TakeBookResponse:
+      type: object
+      example:
+        {
+          reservation_uid: "f464ca3a-fcf7-4e3f-86f0-76c7bba96f72",
+          status: "RENTED",
+          start_date: "2021-10-09",
+          till_date: "2021-10-11",
+          book: {
+            book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+            name: "Краткий курс C++ в 7 томах",
+            author: "Бьерн Страуструп",
+            genre: "Научная фантастика",
+          },
+          library: {
+            library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+            name: "Библиотека имени 7 Непьющих",
+            address: "2-я Бауманская ул., д.5, стр.1",
+            city: "Москва"
+          },
+          rating: {
+            stars: 75
+          }
+        }
+      properties:
+        reservation_uid:
+          type: string
+          description: UUID бронирования
+          format: uuid
+        status:
+          type: string
+          description: Статус бронирования книги
+          enum:
+            - RENTED
+            - RETURNED
+            - EXPIRED
+            - LOST
+        start_date:
+          type: string
+          description: Дата начала бронирования
+          format: ISO 8601
+        till_date:
+          type: string
+          description: Дата окончания бронирования
+          format: ISO 8601
+        book:
+          $ref: "#/components/schemas/BookInfo"
+        library:
+          $ref: "#/components/schemas/LibraryResponse"
+        rating:
+          $ref: "#/components/schemas/UserRatingResponse"
+
+    ReturnBookResponse:
+      type: object
+      example:
+        {
+          condition: "EXCELLENT"
+        }
+      properties:
+        condition:
+          type: string
+          description: Состояние книги
+          enum:
+            - EXCELLENT
+            - GOOD
+            - BAD
+
+    UserRatingResponse:
+      type: object
+      example:
+        {
+          stars: 75
+        }
+      properties:
+        stars:
+          type: number
+          description: Количество здесь у пользователя
+          minimum: 0
+          maximum: 100
+
+    BookInfo:
+      type: object
+      example:
+        {
+          book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+          name: "Краткий курс C++ в 7 томах",
+          author: "Бьерн Страуструп",
+          genre: "Научная фантастика",
+        }
+      properties:
+        book_uuid:
+          type: string
+          description: UUID книги
+          format: uuid
+        name:
+          type: string
+          description: Название книги
+        author:
+          type: string
+          description: Автор
+        genre:
+          type: string
+          description: Жанр
+
+    ErrorDescription:
+      type: object
+      properties:
+        field:
+          type: string
+        error:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Информация об ошибке
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Информация об ошибке
+        errors:
+          type: array
+          description: Массив полей с описанием ошибки
+          items:
+            $ref: "#/components/schemas/ErrorDescription"
