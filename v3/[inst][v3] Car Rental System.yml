@@ -1,0 +1,370 @@
+openapi: 3.0.1
+info:
+  title: Hotels Booking System
+  version: "1.0"
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/cars:
+    get:
+      summary: Получить список всех доступных для бронирования автомобилей
+      tags:
+        - Gateway API
+      responses:
+        "200":
+          description: Список доступных для бронирования автомобилей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CarResponse"
+
+  /api/v1/rental:
+    get:
+      summary: Получить информацию об аренде пользователя
+      tags:
+        - Gateway API
+      parameters:
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Информация обо всех арендах
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RentalResponse"
+
+    post:
+      summary: Забронировать автомобиль
+      tags:
+        - Gateway API
+      parameters:
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRentalRequest"
+      responses:
+        "200":
+          description: Информация о бронировании авто
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateRentalResponse"
+        "400":
+          description: Ошибка валидации данных
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+
+  /api/v1/rental/{rentalUid}:
+    get:
+      summary: Информация по конректной аренде пользователя
+      tags:
+        - Gateway API
+      parameters:
+        - name: rentalUid
+          in: path
+          description: UUID аренды
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Информация по конкретному бронированию
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RentalResponse"
+        "404":
+          description: Билет не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      summary: Отмена аренды автомобиля
+      tags:
+        - Gateway API
+      parameters:
+        - name: rentalUid
+          in: path
+          description: UUID аренды
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-User-Name
+          in: header
+          description: Имя пользователя
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Аренда успешно отменена
+        "404":
+          description: Аренда не найдена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    CarResponse:
+      type: object
+      example:
+        {
+          car_uid: "109b42f3-198d-4c89-9276-a7520a7120ab",
+          brand: "Mercedes Benz",
+          model: "GLA 250",
+          registration_number: "ЛО777Х799",
+          power: 249,
+          type: "SEDAN",
+          price: 3500
+        }
+      properties:
+        car_uid:
+          type: string
+          format: uuid
+          description: UUID автомобиля
+        brand:
+          type: string
+          description: Марка автомобиля
+        model:
+          type: string
+          description: Модель автомобиля
+        registration_number:
+          type: string
+          description: Регистрационный номер автомобиля
+        power:
+          type: number
+          description: Мощность автомобиля в лошадиных силах
+        type:
+          type: string
+          description: Тип автомобиля
+          enum:
+            - SEDAN
+            - SUV
+            - MINIVAN
+            - ROADSTER
+        price:
+          type: number
+          description: Цена автомобиля за сутки
+
+    RentalResponse:
+      type: object
+      example:
+        {
+          rental_uid: "4fd4fc0c-7840-483c-bcf5-3e2be7d4ea69",
+          status: "IN_PROGRESS",
+          date_from: "2021-10-08",
+          date_to: "2021-10-11",
+          car: {
+            car_uid: "109b42f3-198d-4c89-9276-a7520a7120ab",
+            brand: "Mercedes Benz",
+            model: "GLA 250",
+            registration_number: "ЛО777Х799"
+          },
+          payment: {
+            payment_uid: "238c733c-fb1e-40a9-aadb-73cb8f90675d",
+            status: "PAID",
+            price: 3500
+          }
+        }
+      properties:
+        rental_uid:
+          type: string
+          description: UUID аренды
+          format: uuid
+        status:
+          type: string
+          description: Статус аренды
+          enum:
+            - NEW
+            - IN_PROGRESS
+            - FINISHED
+            - CANCELED
+            - EXPIRED
+        date_from:
+          type: string
+          description: Дата начала аренды
+          format: ISO 8601
+        date_to:
+          type: string
+          description: Дата окончания аренды
+          format: ISO 8601
+        car:
+          $ref: "#/components/schemas/CarInfo"
+        payment:
+          $ref: "#/components/schemas/PaymentInfo"
+
+    CreateRentalRequest:
+      type: object
+      example:
+        {
+          car_uid: "109b42f3-198d-4c89-9276-a7520a7120ab",
+          date_from: "2021-10-08",
+          date_to: "2021-10-11",
+          price: 3500
+        }
+      properties:
+        car_uid:
+          type: string
+          format: uuid
+          description: UUID автомобиля
+        date_from:
+          type: string
+          description: Дата начала аренды
+          format: ISO 8601
+        date_to:
+          type: string
+          description: Дата окончания аренды
+          format: ISO 8601
+        price:
+          type: number
+          description: Общая стоимость аренды
+
+    CreateRentalResponse:
+      type: object
+      example:
+        {
+          rental_uid: "4fd4fc0c-7840-483c-bcf5-3e2be7d4ea69",
+          status: "NEW",
+          car_uid: "109b42f3-198d-4c89-9276-a7520a7120ab",
+          date_from: "2021-10-08",
+          date_to: "2021-10-11",
+          payment: {
+            payment_uid: "238c733c-fb1e-40a9-aadb-73cb8f90675d",
+            status: "PAID",
+            price: 3500
+          }
+        }
+      properties:
+        rental_uid:
+          type: string
+          description: UUID аренды
+          format: uuid
+        status:
+          type: string
+          description: Статус аренды
+          enum:
+            - NEW
+            - IN_PROGRESS
+            - FINISHED
+            - CANCELED
+            - EXPIRED
+        car_uid:
+          type: string
+          format: uuid
+          description: UUID автомобиля
+        date_from:
+          type: string
+          description: Дата начала аренды
+          format: ISO 8601
+        date_to:
+          type: string
+          description: Дата окончания аренды
+          format: ISO 8601
+        payment:
+          $ref: "#/components/schemas/PaymentInfo"
+
+    CarInfo:
+      type: object
+      example:
+        {
+          car_uid: "109b42f3-198d-4c89-9276-a7520a7120ab",
+          brand: "Mercedes Benz",
+          model: "GLA 250",
+          registration_number: "ЛО777Х799"
+        }
+      properties:
+        car_uid:
+          type: string
+          format: uuid
+          description: UUID автомобиля
+        brand:
+          type: string
+          description: Марка автомобиля
+        model:
+          type: string
+          description: Модель автомобиля
+        registration_number:
+          type: string
+          description: Регистрационный номер автомобиля
+
+    PaymentInfo:
+      type: object
+      example:
+        {
+          payment_uid: "238c733c-fb1e-40a9-aadb-73cb8f90675d",
+          status: "PAID",
+          price: 3500
+        }
+      properties:
+        payment_uid:
+          type: string
+          format: uuid
+          description: UUID платежа
+        status:
+          type: string
+          description: Статус платежа
+          enum:
+            - RESERVED
+            - PAID
+            - REVERSED
+            - CANCELED
+        price:
+          type: number
+          description: Сумма платежа
+
+    ErrorDescription:
+      type: object
+      properties:
+        field:
+          type: string
+        error:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Информация об ошибке
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Информация об ошибке
+        errors:
+          type: array
+          description: Массив полей с описанием ошибки
+          items:
+            $ref: "#/components/schemas/ErrorDescription"

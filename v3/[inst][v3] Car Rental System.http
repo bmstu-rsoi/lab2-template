@@ -48,6 +48,7 @@ Content-Type: application/json
     "date_from": "datetime",
     "date_to": "datetime",
     "car": {
+      "car_uid": "string",
       "brand": "string",
       "model": "string",
       "registration_number": "string"
@@ -73,18 +74,18 @@ Content-Type: application/json
 }
 
 # RESPONSE
-#{
-#  "rental_uid": "string",
-#  "status": "string",
-#  "date_from": "datetime",
-#  "date_to": "datetime",
-#  "car_uid": "string",
-#  "payment": {
-#    "payment_uid": "string",
-#    "status": "string",
-#    "price": "number"
-#  }
-#}
+{
+  "rental_uid": "string",
+  "status": "string",
+  "date_from": "datetime",
+  "date_to": "datetime",
+  "car_uid": "string",
+  "payment": {
+    "payment_uid": "string",
+    "status": "string",
+    "price": "number"
+  }
+}
 
 ### Отменить бронирование
 DELETE {{baseUrl}}/api/v1/rental/{{rentalUid}}

@@ -34,7 +34,7 @@ paths:
             type: string
       responses:
         "200":
-          description: Польная информация о пользователе
+          description: Полная информация о пользователе
           content:
             application/json:
               schema:
