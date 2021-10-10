@@ -10,6 +10,20 @@ paths:
       summary: Получить список рейстов
       tags:
         - Gateway API
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            maximum: 100
       responses:
         "200":
           description: Список рейсов
@@ -155,7 +169,7 @@ paths:
 
   /api/v1/privilege:
     get:
-      summary: Получить историю бонусного счета
+      summary: Получить информацию о состоянии бонусного счета
       tags:
         - Gateway API
       parameters:
@@ -179,11 +193,11 @@ components:
       type: object
       example:
         {
-          flight_number: "AFL031",
-          from_airport: "Санкт-Петербург Пулково",
-          to_airport: "Москва Шереметьево",
-          date: "2021-10-08T19:59:19Z",
-          price: 1500
+          "flight_number": "AFL031",
+          "from_airport": "Санкт-Петербург Пулково",
+          "to_airport": "Москва Шереметьево",
+          "date": "2021-10-08T19:59:19Z",
+          "price": 1500
         }
       properties:
         flight_number:
@@ -207,12 +221,13 @@ components:
       type: object
       example:
         {
-          ticket_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          flight_number: "AFL031",
-          from_airport: "Санкт-Петербург Пулково",
-          to_airport: "Москва Шереметьево",
-          date: "2021-10-08T19:59:19Z",
-          price: 1500
+          "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "flight_number": "AFL031",
+          "from_airport": "Санкт-Петербург Пулково",
+          "to_airport": "Москва Шереметьево",
+          "date": "2021-10-08T19:59:19Z",
+          "price": 1500,
+          "status": "PAID"
         }
       properties:
         ticket_uid:
@@ -235,24 +250,31 @@ components:
         price:
           type: number
           description: Стоимость
+        status:
+          type: string
+          description: Статус билета
+          enum:
+            - PAID
+            - CANCELED
 
     UserInfoResponse:
       type: object
       example:
         {
-          tickets: [
+          "tickets": [
             {
-              ticket_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-              flight_number: "AFL031",
-              from_airport: "Санкт-Петербург Пулково",
-              to_airport: "Москва Шереметьево",
-              date: "2021-10-08T19:59:19Z",
-              price: 1500
+              "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+              "flight_number": "AFL031",
+              "from_airport": "Санкт-Петербург Пулково",
+              "to_airport": "Москва Шереметьево",
+              "date": "2021-10-08T19:59:19Z",
+              "price": 1500,
+              "status": "PAID"
             }
           ],
-          privilege: {
-            balance: 1500,
-            status: "GOLD"
+          "privilege": {
+            "balance": 1500,
+            "status": "GOLD"
           }
         }
       properties:
@@ -282,13 +304,14 @@ components:
       type: object
       example:
         {
-          balance: 1500,
-          status: "GOLD",
-          history: [
+          "balance": 1500,
+          "status": "GOLD",
+          "history": [
             {
-              date: "2021-10-08T19:59:19Z",
-              balance_diff: 1500,
-              operation_type: "FILL_IN_BALANCE"
+              "date": "2021-10-08T19:59:19Z",
+              "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+              "balance_diff": 1500,
+              "operation_type": "FILL_IN_BALANCE"
             }
           ]
         }
@@ -296,6 +319,9 @@ components:
         balance:
           type: string
           description: Баланс бонусного счета
+        ticket_uid:
+          type: string
+          description: UUID билета по которому была операция с бонусами
         status:
           type: string
           description: Статус в бонусной программе
@@ -331,10 +357,10 @@ components:
       type: object
       example:
         {
-          flight_number: "AFL031",
-          date: "2021-10-08T19:59:19Z",
-          price: 1500,
-          paid_from_balance: true
+          "flight_number": "AFL031",
+          "date": "2021-10-08T19:59:19Z",
+          "price": 1500,
+          "paid_from_balance": true
         }
       properties:
         flight_number:
@@ -355,17 +381,18 @@ components:
       type: object
       example:
         {
-          ticket_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          flight_number: "AFL031",
-          from_airport: "Санкт-Петербург Пулково",
-          to_airport: "Москва Шереметьево",
-          date: "2021-10-08T19:59:19Z",
-          price: 1500,
-          paid_by_money: 1500,
-          paid_by_bonuses: 0,
-          privilege: {
-            balance: 1500,
-            status: "GOLD"
+          "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "flight_number": "AFL031",
+          "from_airport": "Санкт-Петербург Пулково",
+          "to_airport": "Москва Шереметьево",
+          "date": "2021-10-08T19:59:19Z",
+          "price": 1500,
+          "paid_by_money": 1500,
+          "paid_by_bonuses": 0,
+          "status": "PAID",
+          "privilege": {
+            "balance": 1500,
+            "status": "GOLD"
           }
         }
       properties:
@@ -384,8 +411,14 @@ components:
           description: Страна и аэропорт прибытия
         date:
           type: string
-          description: Время вылета 
+          description: Время вылета
           format: ISO 8601
+        status:
+          type: string
+          description: Статус билета
+          enum:
+            - PAID
+            - CANCELED
         price:
           type: number
           description: Стоимость
