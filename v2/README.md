@@ -16,7 +16,7 @@ CREATE TABLE reservation
     payment_uid     uuid        NOT NULL,
     hotel_id        INT REFERENCES hotels (id),
     status          VARCHAR(20) NOT NULL
-        CHECK (status IN ('PAID', 'RESERVED', 'CANCELED')),
+        CHECK (status IN ('PAID', 'CANCELED')),
     start_date      TIMESTAMP WITH TIME ZONE,
     end_data        TIMESTAMP WITH TIME ZONE
 );
@@ -42,7 +42,7 @@ CREATE TABLE payment
     id          SERIAL PRIMARY KEY,
     payment_uid uuid        NOT NULL,
     status      VARCHAR(20) NOT NULL
-        CHECK (status IN ('PAID', 'REVERSED', 'CANCELED')),
+        CHECK (status IN ('PAID', 'CANCELED')),
     price       INT         NOT NULL
 );
 ```
@@ -66,7 +66,7 @@ CREATE TABLE loyalty
 #### Получить список отелей
 
 ```http request
-GET {{baesUrl}}/api/v1/hotels
+GET {{baesUrl}}/api/v1/hotels&page={{page}}&size={{size}}
 ```
 
 #### Получить полную информацию о пользователе
@@ -129,8 +129,10 @@ X-User-Name: {{username}}
 
 #### Отменить бронирование
 
-При отмене статус бронирования помечается как `CANCELED`, а Loyalty Service уменьшается счетчик бронирований. Так же
-возможно понижение статуса лояльности, если счетчик стал ниже границы уровня.
+* Статус бронирования помечается как `CANCELED`.
+* В Payment Service запись об оплате помечается отмененной (статус `CANCELED`).
+* Loyalty Service уменьшается счетчик бронирований. Так же возможно понижение статуса лояльности, если счетчик стал ниже
+  границы уровня.
 
 ```http request
 DELETE {{baesUrl}}/api/v1/reservations/{{reservationUid}}

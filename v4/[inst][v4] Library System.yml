@@ -11,6 +11,19 @@ paths:
       tags:
         - Gateway API
       parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            maximum: 100
         - name: city
           in: query
           required: true
@@ -33,6 +46,19 @@ paths:
       tags:
         - Gateway API
       parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: number
+            minimum: 1
+            maximum: 100
         - name: libraryUid
           in: path
           required: true
@@ -51,7 +77,7 @@ paths:
 
   /api/v1/reservations:
     get:
-      summary: Получить информацию по всем взятым в прокат книгам
+      summary: Получить информацию по всем взятым в прокат книгам пользователя
       tags:
         - Gateway API
       parameters:
@@ -124,7 +150,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ReturnBookResponse"
+              $ref: "#/components/schemas/ReturnBookRequest"
       responses:
         "204":
           description: Книга успешно возвращена
@@ -161,13 +187,13 @@ components:
       type: object
       example:
         {
-          library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
-          name: "Библиотека имени 7 Непьющих",
-          address: "2-я Бауманская ул., д.5, стр.1",
-          city: "Москва"
+          "libraryUid": "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+          "name": "Библиотека имени 7 Непьющих",
+          "address": "2-я Бауманская ул., д.5, стр.1",
+          "city": "Москва"
         }
       properties:
-        library_uid:
+        libraryUid:
           type: string
           description: UUID библиотеки
           format: uuid
@@ -185,14 +211,14 @@ components:
       type: object
       example:
         {
-          book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
-          name: "Краткий курс C++ в 7 томах",
-          author: "Бьерн Страуструп",
-          genre: "Научная фантастика",
-          condition: "EXCELLENT"
+          "bookUid": "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+          "name": "Краткий курс C++ в 7 томах",
+          "author": "Бьерн Страуструп",
+          "genre": "Научная фантастика",
+          "condition": "EXCELLENT"
         }
       properties:
-        book_uuid:
+        bookUid:
           type: string
           description: UUID книги
           format: uuid
@@ -217,25 +243,25 @@ components:
       type: object
       example:
         {
-          reservation_uid: "f464ca3a-fcf7-4e3f-86f0-76c7bba96f72",
-          status: "RENTED",
-          start_date: "2021-10-09",
-          till_date: "2021-10-11",
-          book: {
-            book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
-            name: "Краткий курс C++ в 7 томах",
-            author: "Бьерн Страуструп",
-            genre: "Научная фантастика",
+          "reservationUid": "f464ca3a-fcf7-4e3f-86f0-76c7bba96f72",
+          "status": "RENTED",
+          "startDate": "2021-10-09",
+          "tillDate": "2021-10-11",
+          "book": {
+            "bookUid": "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+            "name": "Краткий курс C++ в 7 томах",
+            "author": "Бьерн Страуструп",
+            "genre": "Научная фантастика"
           },
-          library: {
-            library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
-            name: "Библиотека имени 7 Непьющих",
-            address: "2-я Бауманская ул., д.5, стр.1",
-            city: "Москва"
+          "library": {
+            "libraryUid": "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+            "name": "Библиотека имени 7 Непьющих",
+            "address": "2-я Бауманская ул., д.5, стр.1",
+            "city": "Москва"
           }
         }
       properties:
-        reservation_uid:
+        reservationUid:
           type: string
           description: UUID бронирования
           format: uuid
@@ -247,11 +273,11 @@ components:
             - RETURNED
             - EXPIRED
             - LOST
-        start_date:
+        startDate:
           type: string
           description: Дата начала бронирования
           format: ISO 8601
-        till_date:
+        tillDate:
           type: string
           description: Дата окончания бронирования
           format: ISO 8601
@@ -264,20 +290,20 @@ components:
       type: object
       example:
         {
-          book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
-          library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
-          till_date: "2021-10-11"
+          "bookUid": "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+          "libraryUid": "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+          "tillDate": "2021-10-11"
         }
       properties:
-        book_uuid:
+        bookUid:
           type: string
           description: UUID книги
           format: uuid
-        library_uuid:
+        libraryUid:
           type: string
           description: UUID библиотеки
           format: uuid
-        till_date:
+        tillDate:
           type: string
           description: Дата окончания бронирования
           format: ISO 8601
@@ -286,28 +312,28 @@ components:
       type: object
       example:
         {
-          reservation_uid: "f464ca3a-fcf7-4e3f-86f0-76c7bba96f72",
-          status: "RENTED",
-          start_date: "2021-10-09",
-          till_date: "2021-10-11",
-          book: {
-            book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
-            name: "Краткий курс C++ в 7 томах",
-            author: "Бьерн Страуструп",
-            genre: "Научная фантастика",
+          "reservationUid": "f464ca3a-fcf7-4e3f-86f0-76c7bba96f72",
+          "status": "RENTED",
+          "startDate": "2021-10-09",
+          "tillDate": "2021-10-11",
+          "book": {
+            "bookUid": "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+            "name": "Краткий курс C++ в 7 томах",
+            "author": "Бьерн Страуструп",
+            "genre": "Научная фантастика",
           },
-          library: {
-            library_uid: "83575e12-7ce0-48ee-9931-51919ff3c9ee",
-            name: "Библиотека имени 7 Непьющих",
-            address: "2-я Бауманская ул., д.5, стр.1",
-            city: "Москва"
+          "library": {
+            "libraryUid": "83575e12-7ce0-48ee-9931-51919ff3c9ee",
+            "name": "Библиотека имени 7 Непьющих",
+            "address": "2-я Бауманская ул., д.5, стр.1",
+            "city": "Москва"
           },
-          rating: {
-            stars: 75
+          "rating": {
+            "stars": 75
           }
         }
       properties:
-        reservation_uid:
+        reservationUid:
           type: string
           description: UUID бронирования
           format: uuid
@@ -319,11 +345,11 @@ components:
             - RETURNED
             - EXPIRED
             - LOST
-        start_date:
+        startDate:
           type: string
           description: Дата начала бронирования
           format: ISO 8601
-        till_date:
+        tillDate:
           type: string
           description: Дата окончания бронирования
           format: ISO 8601
@@ -334,11 +360,12 @@ components:
         rating:
           $ref: "#/components/schemas/UserRatingResponse"
 
-    ReturnBookResponse:
+    ReturnBookRequest:
       type: object
       example:
         {
-          condition: "EXCELLENT"
+          "condition": "EXCELLENT",
+          "date": "2021-10-11"
         }
       properties:
         condition:
@@ -348,12 +375,16 @@ components:
             - EXCELLENT
             - GOOD
             - BAD
+        date:
+          type: string
+          description: Дата возврата
+          format: ISO 8601
 
     UserRatingResponse:
       type: object
       example:
         {
-          stars: 75
+          "stars": 75
         }
       properties:
         stars:
@@ -366,13 +397,13 @@ components:
       type: object
       example:
         {
-          book_uid: "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
-          name: "Краткий курс C++ в 7 томах",
-          author: "Бьерн Страуструп",
-          genre: "Научная фантастика",
+          "bookUid": "f7cdc58f-2caf-4b15-9727-f89dcc629b27",
+          "name": "Краткий курс C++ в 7 томах",
+          "author": "Бьерн Страуструп",
+          "genre": "Научная фантастика",
         }
       properties:
-        book_uuid:
+        bookUid:
           type: string
           description: UUID книги
           format: uuid
