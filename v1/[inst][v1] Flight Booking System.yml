@@ -193,20 +193,20 @@ components:
       type: object
       example:
         {
-          "flight_number": "AFL031",
-          "from_airport": "Санкт-Петербург Пулково",
-          "to_airport": "Москва Шереметьево",
+          "flightNumber": "AFL031",
+          "fromAirport": "Санкт-Петербург Пулково",
+          "toAirport": "Москва Шереметьево",
           "date": "2021-10-08T19:59:19Z",
           "price": 1500
         }
       properties:
-        flight_number:
+        flightNumber:
           type: string
           description: Номер полета
-        from_airport:
+        fromAirport:
           type: string
           description: Страна и аэропорт прибытия
-        to_airport:
+        toAirport:
           type: string
           description: Страна и аэропорт прибытия
         date:
@@ -221,26 +221,26 @@ components:
       type: object
       example:
         {
-          "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          "flight_number": "AFL031",
-          "from_airport": "Санкт-Петербург Пулково",
-          "to_airport": "Москва Шереметьево",
+          "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "flightNumber": "AFL031",
+          "fromAirport": "Санкт-Петербург Пулково",
+          "toAirport": "Москва Шереметьево",
           "date": "2021-10-08T19:59:19Z",
           "price": 1500,
           "status": "PAID"
         }
       properties:
-        ticket_uid:
+        tickerUid:
           type: string
           description: UUID билета
           format: uuid
-        flight_number:
+        flightNumber:
           type: string
           description: Номер полета
-        from_airport:
+        fromAirport:
           type: string
           description: Страна и аэропорт прибытия
-        to_airport:
+        toAirport:
           type: string
           description: Страна и аэропорт прибытия
         date:
@@ -263,10 +263,10 @@ components:
         {
           "tickets": [
             {
-              "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
-              "flight_number": "AFL031",
-              "from_airport": "Санкт-Петербург Пулково",
-              "to_airport": "Москва Шереметьево",
+              "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+              "flightNumber": "AFL031",
+              "fromAirport": "Санкт-Петербург Пулково",
+              "toAirport": "Москва Шереметьево",
               "date": "2021-10-08T19:59:19Z",
               "price": 1500,
               "status": "PAID"
@@ -309,9 +309,9 @@ components:
           "history": [
             {
               "date": "2021-10-08T19:59:19Z",
-              "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
-              "balance_diff": 1500,
-              "operation_type": "FILL_IN_BALANCE"
+              "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+              "balanceDiff": 1500,
+              "operationType": "FILL_IN_BALANCE"
             }
           ]
         }
@@ -319,7 +319,7 @@ components:
         balance:
           type: string
           description: Баланс бонусного счета
-        ticket_uid:
+        tickerUid:
           type: string
           description: UUID билета по которому была операция с бонусами
         status:
@@ -337,15 +337,22 @@ components:
 
     BalanceHistory:
       type: object
+      example:
+        {
+          "date": "2021-10-08T19:59:19Z",
+          "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "balanceDiff": 1500,
+          "operationType": "FILL_IN_BALANCE"
+        }
       properties:
         date:
           type: string
           description: Дата и время операции
           format: ISO 8601
-        balance_diff:
+        balanceDiff:
           type: string
           description: Изменение баланса
-        operation_type:
+        operationType:
           type: string
           description: Тип операции
           enum:
@@ -357,13 +364,13 @@ components:
       type: object
       example:
         {
-          "flight_number": "AFL031",
+          "flightNumber": "AFL031",
           "date": "2021-10-08T19:59:19Z",
           "price": 1500,
-          "paid_from_balance": true
+          "paidFromBalance": true
         }
       properties:
-        flight_number:
+        flightNumber:
           type: string
           description: Номер полета
         date:
@@ -373,7 +380,7 @@ components:
         price:
           type: number
           description: Стоимость
-        paid_from_balance:
+        paidFromBalance:
           type: boolean
           description: Выполнить списание бонусных баллов в учет покупки билета
 
@@ -381,14 +388,14 @@ components:
       type: object
       example:
         {
-          "ticket_uid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          "flight_number": "AFL031",
-          "from_airport": "Санкт-Петербург Пулково",
-          "to_airport": "Москва Шереметьево",
+          "ticketUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "flightNumber": "AFL031",
+          "fromAirport": "Санкт-Петербург Пулково",
+          "toAirport": "Москва Шереметьево",
           "date": "2021-10-08T19:59:19Z",
           "price": 1500,
-          "paid_by_money": 1500,
-          "paid_by_bonuses": 0,
+          "paidByMoney": 1500,
+          "paidByBonuses": 0,
           "status": "PAID",
           "privilege": {
             "balance": 1500,
@@ -396,17 +403,17 @@ components:
           }
         }
       properties:
-        ticket_uid:
+        ticketUid:
           type: string
           description: UUID билета
           format: uuid
-        flight_number:
+        flightNumber:
           type: string
           description: Номер полета
-        from_airport:
+        fromAirport:
           type: string
           description: Страна и аэропорт прибытия
-        to_airport:
+        toAirport:
           type: string
           description: Страна и аэропорт прибытия
         date:
@@ -422,10 +429,10 @@ components:
         price:
           type: number
           description: Стоимость
-        paid_by_money:
+        paidByMoney:
           type: number
           description: Сумма оплаченная деньгами
-        paid_by_bonuses:
+        paidByBonuses:
           type: number
           description: Сумма оплаченная бонусами
         privilege:

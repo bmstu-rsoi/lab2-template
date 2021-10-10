@@ -3,7 +3,9 @@
 Система предоставляет пользователю сервис поиска и бронирования отелей на интересующие даты. В зависимости от количества
 заказов система лояльности дает скидку пользователю на новые бронирования.
 
-### Reservation Service
+### Структура Базы Данных
+
+#### Reservation Service
 
 ```sql
 CREATE TABLE reservation
@@ -32,7 +34,7 @@ CREATE TABLE hotels
 );
 ```
 
-### Payment Service
+#### Payment Service
 
 ```sql
 CREATE TABLE payment
@@ -45,17 +47,101 @@ CREATE TABLE payment
 );
 ```
 
-### Loyalty Service
+#### Loyalty Service
 
 ```sql
 CREATE TABLE loyalty
 (
-    id       SERIAL PRIMARY KEY,
-    username VARCHAR(80) NOT NULL UNIQUE,
-    status   VARCHAR(80) NOT NULL DEFAULT 'BRONZE'
+    id                SERIAL PRIMARY KEY,
+    username          VARCHAR(80) NOT NULL UNIQUE,
+    reservation_count INT         NOT NULL DEFAULT 0,
+    status            VARCHAR(80) NOT NULL DEFAULT 'BRONZE'
         CHECK (status IN ('BRONZE', 'SILVER', 'GOLD')),
-    discount INT         NOT NULL
+    discount          INT         NOT NULL
 );
 ```
 
-[OpenAPI](%5Binst%5D%5Bv2%5D%20Hotels%20Booking%20System.yml)
+### Описание API
+
+#### Получить список отелей
+
+```http request
+GET {{baesUrl}}/api/v1/hotels
+```
+
+#### Получить полную информацию о пользователе
+
+Возвращается информация о бронированиях и статусе в системе лояльности.
+
+```http request
+GET {{baesUrl}}/api/v1/me
+X-User-Name: {{username}}
+```
+
+#### Информация по всем бронированиям пользователя
+
+```http request
+GET {{baesUrl}}/api/v1/reservations
+X-User-Name: {{username}}
+```
+
+#### Информация по конкретному бронированию
+
+При запросе требуется проверить, что бронирование принадлежит пользователю.
+
+```http request
+GET {{baesUrl}}/api/v1/reservations/{{reservationUid}}
+X-User-Name: {{username}}
+```
+
+#### Забронировать отель
+
+Пользователь вызывает метод `GET {{baseUrl}}/api/v1/hotels` и выбирает нужный отель и в запросе на бронирование
+передает:
+
+* `hotelUid` (UUID отеля) – берется из запроса `/hotels`;
+* `startDate` и `endDate` (дата начала и конца бронирования) – задается пользователем.
+
+Система проверяет, что отель с таким `hotelUid` существует. Считаем что в отеле бесконечное количество мест.
+
+Считается количество ночей (`endDate` – `startDate`), вычисляется общая сумма бронирования, выполняется обращение в
+Loyalty Service и получается скидка в зависимости от статуса клиента:
+
+* BRONZE – 5%
+* SILVER – 7%
+* GOLD – 10%
+
+После применения скидки выполняется запрос в Payment Service и создается новая запись об оплате. После этого выполняется
+обращение в сервис Loyalty Service, увеличивается счетчик бронирований. По-умолчанию у клиента статус `BRONZE`,
+статус `SILVER` присваивается после 10 бронирований, `GOLD` после 20.
+
+```http request
+POST {{baesUrl}}/api/v1/reservations
+Content-Type: application/json
+X-User-Name: {{username}}
+
+{
+  "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+  "startDate": "2021-10-08",
+  "endDate": "2021-10-11"
+}
+```
+
+#### Отменить бронирование
+
+При отмене статус бронирования помечается как `CANCELED`, а Loyalty Service уменьшается счетчик бронирований. Так же
+возможно понижение статуса лояльности, если счетчик стал ниже границы уровня.
+
+```http request
+DELETE {{baesUrl}}/api/v1/reservations/{{reservationUid}}
+X-User-Name: {{username}}
+```
+
+#### Получить информацию о статусе в программе лояльности
+
+```http request
+GET {{baesUrl}}/api/v1/loyalty
+X-User-Name: {{username}}
+```
+
+Описание в формате [OpenAPI](%5Binst%5D%5Bv2%5D%20Hotels%20Booking%20System.yml).

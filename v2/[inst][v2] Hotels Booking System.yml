@@ -94,7 +94,7 @@ paths:
 
   /api/v1/reservations/{reservationUid}:
     get:
-      summary: Информация по конректному бронированию
+      summary: Информация по конкретному бронированию
       tags:
         - Gateway API
       parameters:
@@ -126,7 +126,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 
     delete:
-      summary: Отмена брони
+      summary: Отменить бронирование
       tags:
         - Gateway API
       parameters:
@@ -179,16 +179,16 @@ components:
       type: object
       example:
         {
-          hotel_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          name: "Ararat Park Hyatt Moscow",
-          country: "Россия",
-          city: "Москва",
-          address: "Неглинная ул., 4",
-          stars: 5,
-          price: 10000
+          "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "name": "Ararat Park Hyatt Moscow",
+          "country": "Россия",
+          "city": "Москва",
+          "address": "Неглинная ул., 4",
+          "stars": 5,
+          "price": 10000
         }
       properties:
-        hotel_uid:
+        hotelUid:
           type: string
           format: uuid
           description: UUID отеля
@@ -215,13 +215,13 @@ components:
       type: object
       example:
         {
-          hotel_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          name: "Ararat Park Hyatt Moscow",
-          fullAddress: "Россия, Москва, Неглинная ул., 4",
-          stars: 5
+          "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "name": "Ararat Park Hyatt Moscow",
+          "fullAddress": "Россия, Москва, Неглинная ул., 4",
+          "stars": 5
         }
       properties:
-        hotel_uid:
+        hotelUid:
           type: string
           format: uuid
           description: UUID отеля
@@ -239,27 +239,27 @@ components:
       type: object
       example:
         {
-          reservations: [
+          "reservations": [
             {
-              reservation_uid: "9b4ba1f7-e5ac-465b-ace4-7b54dec20f9a",
-              hotel: {
-                hotel_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-                name: "Ararat Park Hyatt Moscow",
-                fillAddress: "Россия, Москва, Неглинная ул., 4",
-                stars: 5
+              "reservationUid": "9b4ba1f7-e5ac-465b-ace4-7b54dec20f9a",
+              "hotel": {
+                "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+                "name": "Ararat Park Hyatt Moscow",
+                "fillAddress": "Россия, Москва, Неглинная ул., 4",
+                "stars": 5
               },
-              start_date: "2021-10-08",
-              end_date: "2021-10-11",
-              status: "PAID",
-              payment: {
-                status: "PAID",
-                price: 10000
+              "startDate": "2021-10-08",
+              "endDate": "2021-10-11",
+              "status": "PAID",
+              "payment": {
+                "status": "PAID",
+                "price": 10000
               }
             }
           ],
-          loyalty: {
-            status: "GOLD",
-            discount: 10
+          "loyalty": {
+            "status": "GOLD",
+            "discount": 10
           }
         }
       properties:
@@ -274,33 +274,33 @@ components:
       type: object
       example:
         {
-          reservation_uid: "9b4ba1f7-e5ac-465b-ace4-7b54dec20f9a",
-          hotel: {
-            hotel_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-            name: "Ararat Park Hyatt Moscow",
-            fillAddress: "Россия, Москва, Неглинная ул., 4",
-            stars: 5,
+          "reservationUid": "9b4ba1f7-e5ac-465b-ace4-7b54dec20f9a",
+          "hotel": {
+            "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+            "name": "Ararat Park Hyatt Moscow",
+            "fillAddress": "Россия, Москва, Неглинная ул., 4",
+            "stars": 5
           },
-          start_date: "2021-10-08",
-          end_date: "2021-10-11",
-          status: "PAID",
-          payment: {
-            status: "PAID",
-            price: 10000
+          "startDate": "2021-10-08",
+          "endDate": "2021-10-11",
+          "status": "PAID",
+          "payment": {
+            "status": "PAID",
+            "price": 10000
           }
         }
       properties:
-        reservation_uid:
+        reservationUid:
           type: string
           format: uuid
           description: UUID бронирования
         hotel:
           $ref: "#/components/schemas/HotelInfo"
-        start_date:
+        startDate:
           type: string
           description: Дата начала брони
           format: ISO 8601
-        end_date:
+        endDate:
           type: string
           description: Дата начала брони
           format: ISO 8601
@@ -318,57 +318,53 @@ components:
       type: object
       example:
         {
-          hotel_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          start_date: "2021-10-08",
-          end_date: "2021-10-11",
-          price: 10000
+          "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "startDate": "2021-10-08",
+          "endDate": "2021-10-11"
         }
       properties:
-        hotel_uid:
+        hotelUid:
           type: string
           format: uuid
           description: UUID отеля
-        start_date:
+        startDate:
           type: string
           description: Дата начала брони
           format: ISO 8601
-        end_date:
+        endDate:
           type: string
           description: Дата начала брони
           format: ISO 8601
-        price:
-          type: string
-          description: Цена номера за сутки
 
     CreateReservationResponse:
       type: object
       example:
         {
-          reservation_uid: "a254d3d1-c34b-4ce1-a267-06b5b7dc9447",
-          hotel_uid: "049161bb-badd-4fa8-9d90-87c9a82b0668",
-          start_date: "2021-10-08",
-          end_date: "2021-10-11",
-          discount: 10,
-          status: "PAID",
-          payment: {
-            status: "PAID",
-            price: 9000
+          "reservationUid": "a254d3d1-c34b-4ce1-a267-06b5b7dc9447",
+          "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "startDate": "2021-10-08",
+          "endDate": "2021-10-11",
+          "discount": 10,
+          "status": "PAID",
+          "payment": {
+            "status": "PAID",
+            "price": 9000
           }
         }
       properties:
-        reservation_uid:
+        reservationUid:
           type: string
           format: uuid
           description: UUID бронирования
-        hotel_uid:
+        hotelUid:
           type: string
           format: uuid
           description: UUID отеля
-        start_date:
+        startDate:
           type: string
           description: Дата начала брони
           format: ISO 8601
-        end_date:
+        endDate:
           type: string
           description: Дата начала брони
           format: ISO 8601
@@ -389,8 +385,8 @@ components:
       type: object
       example:
         {
-          status: "PAID",
-          price: 9000
+          "status": "PAID",
+          "price": 9000
         }
       properties:
         status:
@@ -408,8 +404,9 @@ components:
       type: object
       example:
         {
-          status: "GOLD",
-          discount: 10
+          "status": "GOLD",
+          "discount": 10,
+          "reservationCount": 25
         }
       properties:
         status:
@@ -422,6 +419,9 @@ components:
         discount:
           type: number
           description: Скидка по программе лояльности
+        reservationCount:
+          type: number
+          description: Количество бронирований
 
     ErrorDescription:
       type: object
