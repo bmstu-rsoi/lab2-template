@@ -48,8 +48,9 @@ CREATE TABLE books
 
 CREATE TABLE library_books
 (
-    book_id    INT REFERENCES books (id),
-    library_id INT REFERENCES library (id)
+    book_id         INT REFERENCES books (id),
+    library_id      INT REFERENCES library (id),
+    available_count INT NOT NULL
 );
 ```
 
@@ -75,6 +76,9 @@ GET {{baseUrl}}/api/v1/libraries?city={{city}}&page={{page}}&size={{size}}
 
 #### Получить список книг в выбранной библиотеке
 
+Если передан флаг `showAll = true`, то выводить книги, которые в текущий момент недоступны для
+аренды (`available_count = 0`).
+
 ```http request
 GET {{baseUrl}}/api/v1/libraries/{{libraryUid}}/books&page={{page}}&size={{size}}
 ```
@@ -87,6 +91,20 @@ X-User-Name: {{username}}
 ```
 
 #### Взять книгу в библиотеке
+
+Пользователь вызывает метод `GET {{baseUrl}}/api/v1/libraries?city={{city}}`, выбирает нужную библиотеку, вызывает
+метод `GET {{baseUrl}}/api/v1/{{libraryUid}}/books` и выбирает нужную книгу для аренды.
+
+* `bookUid` (UUID книги) – берется из запроса `/books`;
+* `libraryUid` (UUID библиотеки) – берется из запроса `/libraries`;
+* `tillDate` (дата окончания бронирования) – задается пользователем.
+
+Перед выдачей книги проверяется количество книг у пользователя на руках (запрос в Reservation Service в
+статусе `RENTED`). После этого выполняется запрос в Rating System и запрашивается количество звезд. Количество звезд
+определяет максимальное количество книг, которые пользователь может одновременно взять в аренду.
+
+Если условие выполнено, то создается запись в Reservation System в статусе `RENTED` и в Library System уменьшается
+количество доступных книг (поле `available_count`).
 
 ```http request
 POST {{baseUrl}}/api/v1/reservations
@@ -102,6 +120,20 @@ X-User-Name: {{username}}
 
 #### Вернуть книгу
 
+* `condition` (состояние, в котором книгу вернули) – задается пользователем;
+* `date` (дата, когда вернули книгу) – задается пользователем.
+
+При возврате книги в Rented System изменяется статус на:
+
+* `EXPIRED` если дата возврата больше `till_date` в записи о резерве;
+* `RETURNED` если книгу сдали в срок.
+
+Если книгу вернули позднее срока и ее состояние на момент выдачи (запись в Reservation System) отличается от состояния,
+в котором ее вернули, то у пользователя _уменьшается_ количество звезд на 10 за каждое условие (сдача позднее срока и в
+плохом состоянии).
+
+Если книгу вернули в исходном состоянии и в срок, то рейтинг пользователя _увеличивается_ на 1 звезду.
+
 ```http request
 POST {{baseUrl}}/api/v1/reservations/{{reservationUid}}/return
 X-User-Name: {{username}}
@@ -113,6 +145,9 @@ X-User-Name: {{username}}
 ```
 
 #### Получить рейтинг пользователя
+
+Количество звезд пользователя определяем максимальное количество одновременно арендованных книг. У пользователя может
+быть от 1 до 100 звезд, если изменение выходит за эти границы, то устанавливается граничное значение.
 
 ```http request
 GET {{baseUrl}}/api/v1/rating

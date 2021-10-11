@@ -56,6 +56,8 @@ CREATE TABLE payment
 
 #### Получить список всех доступных для бронирования автомобилей
 
+Если передан флаг `showAll = true`, то выводить автомобили в резерве (`availability = false`).
+
 ```http request
 GET {{baseUrl}}/api/v1/cars&page={{page}}&size={{size}}
 ```

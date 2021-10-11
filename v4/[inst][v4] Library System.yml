@@ -59,6 +59,11 @@ paths:
             type: number
             minimum: 1
             maximum: 100
+        - name: showAll
+          in: query
+          required: false
+          schema:
+            type: boolean
         - name: libraryUid
           in: path
           required: true
@@ -215,7 +220,8 @@ components:
           "name": "Краткий курс C++ в 7 томах",
           "author": "Бьерн Страуструп",
           "genre": "Научная фантастика",
-          "condition": "EXCELLENT"
+          "condition": "EXCELLENT",
+          "avaiblableCount": 1
         }
       properties:
         bookUid:
@@ -238,6 +244,9 @@ components:
             - EXCELLENT
             - GOOD
             - BAD
+        avaiblableCount:
+          type: number
+          description: Количество книг, доступных для аренды в библиотеке
 
     BookReservationResponse:
       type: object
