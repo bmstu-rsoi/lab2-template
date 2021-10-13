@@ -31,9 +31,8 @@
 1. Горизонтальную коммуникацию между сервисами делать нельзя. Предположим, у нас сервисы `UserService`, `OrderService`,
    `WarehouseService` и `Gateway`:
     * На `Gateway` от пользователя `Alex` приходит запрос `Купить товар с productName: 'Lego Technic 42129`.
-    * Для оформления заказа требуется проверить что пользователь c `userId` существует, получить его имя, сходить
-      в `WarehouseService` получить `itemUid` по .
-    * `Gateway` -> `UserService` получаем `userUid` пользователя по `login: Alex`.
+    * `Gateway` -> `UserService` проверяем что пользователь существует и получаем `userUid` пользователя
+      по `login: Alex`.
     * `Gateway` -> `WarehouseService` получаем `itemUid` товара по `productName` и резервируем его для заказа.
     * `Gateway` -> `OrderService` с `userUid` и `itemUid` и создаем заказ с `orderUid`.
     * `Gateway` -> `WarehouseService` с `orderUid` и переводим товар `itemUid` из статуса `Зарезервировано` в

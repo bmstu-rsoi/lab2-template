@@ -196,7 +196,7 @@ components:
           "flightNumber": "AFL031",
           "fromAirport": "Санкт-Петербург Пулково",
           "toAirport": "Москва Шереметьево",
-          "date": "2021-10-08T19:59:19Z",
+          "date": "2021-10-08 20:00",
           "price": 1500
         }
       properties:
@@ -225,7 +225,7 @@ components:
           "flightNumber": "AFL031",
           "fromAirport": "Санкт-Петербург Пулково",
           "toAirport": "Москва Шереметьево",
-          "date": "2021-10-08T19:59:19Z",
+          "date": "2021-10-08 20:00",
           "price": 1500,
           "status": "PAID"
         }
@@ -267,7 +267,7 @@ components:
               "flightNumber": "AFL031",
               "fromAirport": "Санкт-Петербург Пулково",
               "toAirport": "Москва Шереметьево",
-              "date": "2021-10-08T19:59:19Z",
+              "date": "2021-10-08 20:00",
               "price": 1500,
               "status": "PAID"
             }
@@ -365,7 +365,6 @@ components:
       example:
         {
           "flightNumber": "AFL031",
-          "date": "2021-10-08T19:59:19Z",
           "price": 1500,
           "paidFromBalance": true
         }
@@ -373,10 +372,6 @@ components:
         flightNumber:
           type: string
           description: Номер полета
-        date:
-          type: string
-          description: Дата и время вылета
-          format: ISO 8601
         price:
           type: number
           description: Стоимость
@@ -392,7 +387,7 @@ components:
           "flightNumber": "AFL031",
           "fromAirport": "Санкт-Петербург Пулково",
           "toAirport": "Москва Шереметьево",
-          "date": "2021-10-08T19:59:19Z",
+          "date": "2021-10-08 20:00",
           "price": 1500,
           "paidByMoney": 1500,
           "paidByBonuses": 0,

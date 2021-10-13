@@ -25,10 +25,12 @@ CREATE TABLE ticket
 ```sql
 CREATE TABLE flight
 (
+    id              SERIAL PRIMARY KEY,
     flight_number   VARCHAR(80)              NOT NULL,
     datetime        TIMESTAMP WITH TIME ZONE NOT NULL,
     from_airport_id INT REFERENCES airport (id),
-    to_airport_id   INT REFERENCES airport (id)
+    to_airport_id   INT REFERENCES airport (id),
+    price           INT                      NOT NULL
 );
 
 CREATE TABLE airport
@@ -53,7 +55,7 @@ CREATE TABLE privilege
 
 CREATE TABLE privilege_history
 (
-    id             SERIAL      NOT NULL,
+    id             SERIAL PRIMARY KEY,
     privilege_id   INT REFERENCES privilege (id),
     ticket_uid     uuid        NOT NULL,
     datetime       TIMESTAMP   NOT NULL,
@@ -101,21 +103,20 @@ X-User-Name: {{username}}
 Пользователь вызывает метод `GET {{baseUrl}}/api/v1/flights` выбирает нужный рейс и в запросе на покупку передает:
 
 * `flightNumber` (номер рейса) – берется из запроса `/flights`;
-* `date` (дата перелета) – задается пользователем;
 * `price` (цена) – берется из запроса `/flights`;
-* `painFromBalance` (оплата бонусами) – флаг, указывающий, что для оплаты билета нужно использовать бонусный счет.
+* `paidFromBalance` (оплата бонусами) – флаг, указывающий, что для оплаты билета нужно использовать бонусный счет.
 
 Система проверяет, что рейс с таким номером существует. Считаем что на рейсе бесконечное количество мест.
 
-Если при покупке указан флаг `"painFromBalance": true`, то с бонусного счёта списываются максимальное количество баллов
+Если при покупке указан флаг `"paidFromBalance": true`, то с бонусного счёта списываются максимальное количество баллов
 в отношении 1 балл – 1 рубль.
 
 Т.е. если на бонусном счете было 500 бонусов, билет стоит 1500 рублей и при покупке был указан
-флаг `"painFromBalance": true"`, то со счёта спишется 500 бонусов (в ответе будет указано `"paidByBonuses": 500`), а
+флаг `"paidFromBalance": true"`, то со счёта спишется 500 бонусов (в ответе будет указано `"paidByBonuses": 500`), а
 стоимость билета будет 1000 рублей (в ответе будет указано `"paidByMoney": 1000`). В сервисе Bonus Service в
 таблицу `privilegeHistory` будет добавлена запись о списании со счёта 500 бонусов.
 
-Если при покупке был указан флаг `"painFromBalance": false`, то в ответе будет `"paidByBonuses": 0`, а на бонусный счет
+Если при покупке был указан флаг `"paidFromBalance": false`, то в ответе будет `"paidByBonuses": 0`, а на бонусный счет
 будет начислено бонусов в размере 10% от стоимости заказа. Так же в таблицу `privilegeHistory` будет добавлена запись о
 зачислении бонусов.
 
@@ -126,9 +127,8 @@ X-User-Name: {{username}}
 
 {
   "flightNumber": "AFL031",
-  "date": "2021-10-08T19:59:19Z",
   "price": 1500,
-  "painFromBalance": true
+  "paidFromBalance": true
 }
 ```
 
