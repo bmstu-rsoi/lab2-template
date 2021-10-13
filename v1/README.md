@@ -10,12 +10,12 @@
 ```sql
 CREATE TABLE ticket
 (
-    id         SERIAL PRIMARY KEY,
-    ticket_uid uuid UNIQUE NOT NULL,
-    username   VARCHAR(80) NOT NULL,
-    flight_uid uuid        NOT NULL,
-    price      INT         NOT NULL,
-    status     VARCHAR(20) NOT NULL
+    id            SERIAL PRIMARY KEY,
+    ticket_uid    uuid UNIQUE NOT NULL,
+    username      VARCHAR(80) NOT NULL,
+    flight_number VARCHAR(20) NOT NULL,
+    price         INT         NOT NULL,
+    status        VARCHAR(20) NOT NULL
         CHECK (status IN ('PAID', 'CANCELED'))
 );
 ```
@@ -26,7 +26,7 @@ CREATE TABLE ticket
 CREATE TABLE flight
 (
     id              SERIAL PRIMARY KEY,
-    flight_number   VARCHAR(80)              NOT NULL,
+    flight_number   VARCHAR(20)              NOT NULL,
     datetime        TIMESTAMP WITH TIME ZONE NOT NULL,
     from_airport_id INT REFERENCES airport (id),
     to_airport_id   INT REFERENCES airport (id),
