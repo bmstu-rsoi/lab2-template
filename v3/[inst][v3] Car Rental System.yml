@@ -37,7 +37,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CarResponse"
+                  $ref: "#/components/schemas/PaginationResponse"
 
   /api/v1/rental:
     get:
@@ -183,6 +183,41 @@ paths:
 
 components:
   schemas:
+    PaginationResponse:
+      type: object
+      example:
+        {
+          "page": 1,
+          "pageSize": 1,
+          "totalElements": 1,
+          "items": [
+            {
+              "carUid": "109b42f3-198d-4c89-9276-a7520a7120ab",
+              "brand": "Mercedes Benz",
+              "model": "GLA 250",
+              "registrationNumber": "ЛО777Х799",
+              "power": 249,
+              "type": "SEDAN",
+              "price": 3500,
+              "available": true
+            }
+          ]
+        }
+      properties:
+        page:
+          type: number
+          description: Номер страницы
+        pageSize:
+          type: number
+          description: Количество элементов на странице
+        totalElements:
+          type: number
+          description: Общее количество элементов
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CarResponse"
+
     CarResponse:
       type: object
       example:
@@ -245,7 +280,7 @@ components:
           "payment": {
             "paymentUid": "238c733c-fb1e-40a9-aadb-73cb8f90675d",
             "status": "PAID",
-            "price": 3500
+            "price": 10500
           }
         }
       properties:
@@ -261,7 +296,6 @@ components:
             - IN_PROGRESS
             - FINISHED
             - CANCELED
-            - EXPIRED
         dateFrom:
           type: string
           description: Дата начала аренды
@@ -302,14 +336,14 @@ components:
       example:
         {
           "rentalUid": "4fd4fc0c-7840-483c-bcf5-3e2be7d4ea69",
-          "status": "NEW",
+          "status": "IN_PROGRESS",
           "carUid": "109b42f3-198d-4c89-9276-a7520a7120ab",
           "dateFrom": "2021-10-08",
           "dateTo": "2021-10-11",
           "payment": {
             "paymentUid": "238c733c-fb1e-40a9-aadb-73cb8f90675d",
             "status": "PAID",
-            "price": 3500
+            "price": 1
           }
         }
       properties:
@@ -321,11 +355,9 @@ components:
           type: string
           description: Статус аренды
           enum:
-            - NEW
             - IN_PROGRESS
             - FINISHED
             - CANCELED
-            - EXPIRED
         carUid:
           type: string
           format: uuid
@@ -371,7 +403,7 @@ components:
         {
           "paymentUid": "238c733c-fb1e-40a9-aadb-73cb8f90675d",
           "status": "PAID",
-          "price": 3500
+          "price": 10500
         }
       properties:
         paymentUid:
@@ -382,10 +414,8 @@ components:
           type: string
           description: Статус платежа
           enum:
-            - RESERVED
             - PAID
             - REVERSED
-            - CANCELED
         price:
           type: number
           description: Сумма платежа

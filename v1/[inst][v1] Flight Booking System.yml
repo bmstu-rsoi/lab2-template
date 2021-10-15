@@ -32,7 +32,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/FlightResponse"
+                  $ref: "#/components/schemas/PaginationResponse"
 
   /api/v1/tickets:
     get:
@@ -189,6 +189,38 @@ paths:
 
 components:
   schemas:
+    PaginationResponse:
+      type: object
+      example:
+        {
+          "page": 1,
+          "pageSize": 1,
+          "totalElements": 1,
+          "items": [
+            {
+              "flightNumber": "AFL031",
+              "fromAirport": "Санкт-Петербург Пулково",
+              "toAirport": "Москва Шереметьево",
+              "date": "2021-10-08 20:00",
+              "price": 1500
+            }
+          ]
+        }
+      properties:
+        page:
+          type: number
+          description: Номер страницы
+        pageSize:
+          type: number
+          description: Количество элементов на странице
+        totalElements:
+          type: number
+          description: Общее количество элементов
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlightResponse"
+
     FlightResponse:
       type: object
       example:
@@ -221,7 +253,7 @@ components:
       type: object
       example:
         {
-          "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "ticketUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
           "flightNumber": "AFL031",
           "fromAirport": "Санкт-Петербург Пулково",
           "toAirport": "Москва Шереметьево",
@@ -230,7 +262,7 @@ components:
           "status": "PAID"
         }
       properties:
-        tickerUid:
+        ticketUid:
           type: string
           description: UUID билета
           format: uuid
@@ -263,7 +295,7 @@ components:
         {
           "tickets": [
             {
-              "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+              "ticketUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
               "flightNumber": "AFL031",
               "fromAirport": "Санкт-Петербург Пулково",
               "toAirport": "Москва Шереметьево",
@@ -309,7 +341,7 @@ components:
           "history": [
             {
               "date": "2021-10-08T19:59:19Z",
-              "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+              "ticketUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
               "balanceDiff": 1500,
               "operationType": "FILL_IN_BALANCE"
             }
@@ -319,9 +351,6 @@ components:
         balance:
           type: string
           description: Баланс бонусного счета
-        tickerUid:
-          type: string
-          description: UUID билета по которому была операция с бонусами
         status:
           type: string
           description: Статус в бонусной программе
@@ -340,7 +369,7 @@ components:
       example:
         {
           "date": "2021-10-08T19:59:19Z",
-          "tickerUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "ticketUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
           "balanceDiff": 1500,
           "operationType": "FILL_IN_BALANCE"
         }
@@ -352,6 +381,9 @@ components:
         balanceDiff:
           type: string
           description: Изменение баланса
+        ticketUid:
+          type: string
+          description: UUID билета по которому была операция с бонусами
         operationType:
           type: string
           description: Тип операции

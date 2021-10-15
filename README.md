@@ -18,6 +18,8 @@
 1. Выделить Gateway Service как единую точку входа и межсервисной коммуникации. Горизонтальные запросы между сервисами
    делать _нельзя_.
 1. Код хранить на Github, для сборки использовать Github Actions.
+1. Для автоматических прогонов тестов в файле [autograding.json](.github/classroom/autograding.json)
+   и [classroom.yml](.github/workflows/classroom.yml) заменить `<variant>` на ваш вариант.
 1. Каждый сервис должен быть завернут в docker.
 1. В [classroom.yml](.github/workflows/classroom.yml) дописать шаги на сборку, прогон unit-тестов и деплой каждого
    сервиса на heroku.
@@ -28,7 +30,11 @@
    поднимется контейнер с Postgres 13, будет создана БД `services` и пользователь `program`:`test`. Для создания схем
    нужно прописать в [20-create-schemas.sh](postgres/20-create-schemas.sh) свой вариант задания в переменную `VARIANT`.
    После поднятия контейнера будут созданы схемы, описанные в файлах [schema-$VARIANT](postgres/schemes) по вариантам.
-1. Горизонтальную коммуникацию между сервисами делать нельзя. Предположим, у нас сервисы `UserService`, `OrderService`,
+1. Горизонтальную коммуникацию между сервисами делать нельзя.
+
+   ![Services](images/services.png)
+
+   Предположим, у нас сервисы `UserService`, `OrderService`,
    `WarehouseService` и `Gateway`:
     * На `Gateway` от пользователя `Alex` приходит запрос `Купить товар с productName: 'Lego Technic 42129`.
     * `Gateway` -> `UserService` проверяем что пользователь существует и получаем `userUid` пользователя

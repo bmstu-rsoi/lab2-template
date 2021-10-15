@@ -32,7 +32,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/HotelResponse"
+                  $ref: "#/components/schemas/PaginationResponse"
 
   /api/v1/me:
     get:
@@ -189,6 +189,40 @@ paths:
 
 components:
   schemas:
+    PaginationResponse:
+      type: object
+      example:
+        {
+          "page": 1,
+          "pageSize": 1,
+          "totalElements": 1,
+          "items": [
+            {
+              "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+              "name": "Ararat Park Hyatt Moscow",
+              "country": "Россия",
+              "city": "Москва",
+              "address": "Неглинная ул., 4",
+              "stars": 5,
+              "price": 10000
+            }
+          ]
+        }
+      properties:
+        page:
+          type: number
+          description: Номер страницы
+        pageSize:
+          type: number
+          description: Количество элементов на странице
+        totalElements:
+          type: number
+          description: Общее количество элементов
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/HotelResponse"
+
     HotelResponse:
       type: object
       example:
@@ -259,7 +293,7 @@ components:
               "hotel": {
                 "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
                 "name": "Ararat Park Hyatt Moscow",
-                "fillAddress": "Россия, Москва, Неглинная ул., 4",
+                "fullAddress": "Россия, Москва, Неглинная ул., 4",
                 "stars": 5
               },
               "startDate": "2021-10-08",
@@ -267,7 +301,7 @@ components:
               "status": "PAID",
               "payment": {
                 "status": "PAID",
-                "price": 10000
+                "price": 27000
               }
             }
           ],
@@ -292,7 +326,7 @@ components:
           "hotel": {
             "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
             "name": "Ararat Park Hyatt Moscow",
-            "fillAddress": "Россия, Москва, Неглинная ул., 4",
+            "fullAddress": "Россия, Москва, Неглинная ул., 4",
             "stars": 5
           },
           "startDate": "2021-10-08",
@@ -300,7 +334,7 @@ components:
           "status": "PAID",
           "payment": {
             "status": "PAID",
-            "price": 10000
+            "price": 27000
           }
         }
       properties:
@@ -354,7 +388,7 @@ components:
       type: object
       example:
         {
-          "reservationUid": "a254d3d1-c34b-4ce1-a267-06b5b7dc9447",
+          "reservationUid": "9b4ba1f7-e5ac-465b-ace4-7b54dec20f9a",
           "hotelUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
           "startDate": "2021-10-08",
           "endDate": "2021-10-11",
@@ -362,7 +396,7 @@ components:
           "status": "PAID",
           "payment": {
             "status": "PAID",
-            "price": 9000
+            "price": 27000
           }
         }
       properties:
@@ -400,7 +434,7 @@ components:
       example:
         {
           "status": "PAID",
-          "price": 9000
+          "price": 27000
         }
       properties:
         status:

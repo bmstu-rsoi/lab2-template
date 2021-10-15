@@ -37,10 +37,25 @@ CREATE TABLE airport
 (
     id      SERIAL PRIMARY KEY,
     name    VARCHAR(255),
+    city    VARCHAR(255),
     country VARCHAR(255)
 );
 ```
 
+```json
+{
+  "balance": 1500,
+  "status": "GOLD",
+  "history": [
+    {
+      "date": "2021-10-08T19:59:19Z",
+      "ticketUid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+      "balanceDiff": 1500,
+      "operationType": "FILL_IN_BALANCE"
+    }
+  ]
+}
+```
 #### Bonus Service
 
 ```sql
@@ -152,3 +167,27 @@ X-User-Name: {{username}}
 ```
 
 Описание в формате [OpenAPI](%5Binst%5D%5Bv1%5D%20Flight%20Booking%20System.yml).
+
+### Данные для тестов
+
+Создать данные для тестов:
+
+```yaml
+airport:
+  – id: 1
+    name: Шереметьево
+    city: Москва
+    country: Россия
+  - id: 2
+    name: Пулково
+    city: Санкт-Петербург
+    coutry: Россия
+
+flight:
+  - id: 1
+    flight_number: "AFL031"
+    datetime: "2021-10-08 20:00"
+    from_airport_id: 1
+    to_airport_id: 2
+    price: 1500
+```
