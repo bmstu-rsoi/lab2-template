@@ -66,7 +66,7 @@ CREATE TABLE loyalty
 #### Получить список отелей
 
 ```http request
-GET {{baesUrl}}/api/v1/hotels&page={{page}}&size={{size}}
+GET {{baseUrl}}/api/v1/hotels&page={{page}}&size={{size}}
 ```
 
 #### Получить полную информацию о пользователе
@@ -74,14 +74,14 @@ GET {{baesUrl}}/api/v1/hotels&page={{page}}&size={{size}}
 Возвращается информация о бронированиях и статусе в системе лояльности.
 
 ```http request
-GET {{baesUrl}}/api/v1/me
+GET {{baseUrl}}/api/v1/me
 X-User-Name: {{username}}
 ```
 
 #### Информация по всем бронированиям пользователя
 
 ```http request
-GET {{baesUrl}}/api/v1/reservations
+GET {{baseUrl}}/api/v1/reservations
 X-User-Name: {{username}}
 ```
 
@@ -90,7 +90,7 @@ X-User-Name: {{username}}
 При запросе требуется проверить, что бронирование принадлежит пользователю.
 
 ```http request
-GET {{baesUrl}}/api/v1/reservations/{{reservationUid}}
+GET {{baseUrl}}/api/v1/reservations/{{reservationUid}}
 X-User-Name: {{username}}
 ```
 
@@ -116,7 +116,7 @@ Loyalty Service и получается скидка в зависимости �
 статус `SILVER` присваивается после 10 бронирований, `GOLD` после 20.
 
 ```http request
-POST {{baesUrl}}/api/v1/reservations
+POST {{baseUrl}}/api/v1/reservations
 Content-Type: application/json
 X-User-Name: {{username}}
 
@@ -135,14 +135,14 @@ X-User-Name: {{username}}
   границы уровня.
 
 ```http request
-DELETE {{baesUrl}}/api/v1/reservations/{{reservationUid}}
+DELETE {{baseUrl}}/api/v1/reservations/{{reservationUid}}
 X-User-Name: {{username}}
 ```
 
 #### Получить информацию о статусе в программе лояльности
 
 ```http request
-GET {{baesUrl}}/api/v1/loyalty
+GET {{baseUrl}}/api/v1/loyalty
 X-User-Name: {{username}}
 ```
 
