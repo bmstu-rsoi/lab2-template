@@ -35,9 +35,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/PaginationResponse"
+                $ref: "#/components/schemas/PaginationResponse"
 
   /api/v1/rental:
     get:

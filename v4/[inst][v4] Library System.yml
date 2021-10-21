@@ -36,9 +36,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/LibraryPaginationResponse"
+                $ref: "#/components/schemas/LibraryPaginationResponse"
 
   /api/v1/libraries/{libraryUid}/books:
     get:
@@ -76,9 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/LibraryBookPaginationResponse"
+                $ref: "#/components/schemas/LibraryBookPaginationResponse"
 
   /api/v1/reservations:
     get:
