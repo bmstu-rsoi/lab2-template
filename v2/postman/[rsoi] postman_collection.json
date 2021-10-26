@@ -164,7 +164,7 @@
 									{
 										"description": "(Required) Имя пользователя",
 										"key": "X-User-Name",
-										"value": "Lorem ut dolor"
+										"value": "{{username}}"
 									}
 								],
 								"url": {
@@ -272,7 +272,7 @@
 									{
 										"description": "(Required) Имя пользователя",
 										"key": "X-User-Name",
-										"value": "Lorem ut dolor"
+										"value": "{{username}}"
 									},
 									{
 										"key": "Content-Type",
@@ -506,7 +506,7 @@
 									{
 										"description": "(Required) Имя пользователя",
 										"key": "X-User-Name",
-										"value": "Lorem ut dolor"
+										"value": "{{username}}"
 									}
 								],
 								"url": {
@@ -590,7 +590,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "Lorem ut dolor"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
@@ -672,7 +672,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "Lorem ut dolor"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
@@ -696,7 +696,7 @@
 									{
 										"description": "(Required) Имя пользователя",
 										"key": "X-User-Name",
-										"value": "Lorem ut dolor"
+										"value": "{{username}}"
 									}
 								],
 								"url": {
@@ -746,7 +746,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "Lorem ut dolor"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
