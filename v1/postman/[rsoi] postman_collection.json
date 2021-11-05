@@ -449,7 +449,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "ipsum ut"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
@@ -544,7 +544,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "ipsum ut"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
@@ -568,7 +568,7 @@
 									{
 										"description": "(Required) Имя пользователя",
 										"key": "X-User-Name",
-										"value": "ipsum ut"
+										"value": "{{username}}"
 									}
 								],
 								"url": {
@@ -653,7 +653,7 @@
 									{
 										"description": "(Required) Имя пользователя",
 										"key": "X-User-Name",
-										"value": "ipsum ut"
+										"value": "{{username}}"
 									}
 								],
 								"url": {
@@ -703,7 +703,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "ipsum ut"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
@@ -735,7 +735,7 @@
 									{
 										"description": "(Required) Имя пользователя",
 										"key": "X-User-Name",
-										"value": "ipsum ut"
+										"value": "{{username}}"
 									}
 								],
 								"url": {
