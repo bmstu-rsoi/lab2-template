@@ -815,7 +815,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "cupidatat incididunt enim irure"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
