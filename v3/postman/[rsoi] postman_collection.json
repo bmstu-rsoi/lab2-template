@@ -586,7 +586,7 @@
 									"",
 									"    pm.expect(response.payment).to.be.not.undefined",
 									"    pm.expect(response.payment.paymentUid).to.be.not.undefined",
-									"    pm.expect(response.payment.status).to.be.eq(\"REVERSED\")",
+									"    pm.expect(response.payment.status).to.be.eq(\"CANCELED\")",
 									"    const days = Math.abs(moment(dateFrom).diff(moment(dateTo), \"days\"))",
 									"    pm.expect(response.payment.price).to.be.eq(days * rentalPrice)",
 									"",
@@ -815,7 +815,7 @@
 							{
 								"description": "(Required) Имя пользователя",
 								"key": "X-User-Name",
-								"value": "cupidatat incididunt enim irure"
+								"value": "{{username}}"
 							}
 						],
 						"url": {
