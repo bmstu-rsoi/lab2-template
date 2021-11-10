@@ -652,7 +652,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Забронировать автомобиль\", () => {",
+									"pm.test(\"Получить рейтинг пользователя\", () => {",
 									"    pm.response.to.have.status(200)",
 									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.contains(\"application/json\");",
 									"",
