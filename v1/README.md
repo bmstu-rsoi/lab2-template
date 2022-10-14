@@ -7,6 +7,8 @@
 
 #### Ticket Service
 
+Сервис запускается на порту 8070.
+
 ```sql
 CREATE TABLE ticket
 (
@@ -21,6 +23,8 @@ CREATE TABLE ticket
 ```
 
 #### Flight Service
+
+Сервис запускается на порту 8060.
 
 ```sql
 CREATE TABLE flight
@@ -57,6 +61,8 @@ CREATE TABLE airport
 }
 ```
 #### Bonus Service
+
+Сервис запускается на порту 8050.
 
 ```sql
 CREATE TABLE privilege

@@ -6,6 +6,8 @@
 
 #### Cars Service
 
+Сервис запускается на порту 8070.
+
 ```sql
 CREATE TABLE cars
 (
@@ -24,6 +26,8 @@ CREATE TABLE cars
 
 #### Rental Service
 
+Сервис запускается на порту 8060.
+
 ```sql
 CREATE TABLE rental
 (
@@ -40,6 +44,8 @@ CREATE TABLE rental
 ```
 
 #### Payment Service
+
+Сервис запускается на порту 8050.
 
 ```sql
 CREATE TABLE payment

@@ -7,6 +7,8 @@
 
 #### Reservation Service
 
+Сервис запускается на порту 8070.
+
 ```sql
 CREATE TABLE reservation
 (
@@ -36,6 +38,8 @@ CREATE TABLE hotels
 
 #### Payment Service
 
+Сервис запускается на порту 8060.
+
 ```sql
 CREATE TABLE payment
 (
@@ -48,6 +52,8 @@ CREATE TABLE payment
 ```
 
 #### Loyalty Service
+
+Сервис запускается на порту 8050.
 
 ```sql
 CREATE TABLE loyalty

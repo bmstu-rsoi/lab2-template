@@ -8,6 +8,8 @@
 
 #### Reservation System
 
+Сервис запускается на порту 8070.
+
 ```sql
 CREATE TABLE reservation
 (
@@ -24,6 +26,8 @@ CREATE TABLE reservation
 ```
 
 #### Library System
+
+Сервис запускается на порту 8060.
 
 ```sql
 CREATE TABLE library
@@ -55,6 +59,8 @@ CREATE TABLE library_books
 ```
 
 #### Rating System
+
+Сервис запускается на порту 8050.
 
 ```sql
 CREATE TABLE rating
