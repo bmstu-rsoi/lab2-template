@@ -138,7 +138,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"description": "(Required) Имя пользователя",
+								"description": "Имя пользователя",
 								"key": "X-User-Name",
 								"value": "{{username}}"
 							}
@@ -162,7 +162,7 @@
 								"method": "GET",
 								"header": [
 									{
-										"description": "(Required) Имя пользователя",
+										"description": "Имя пользователя",
 										"key": "X-User-Name",
 										"value": "{{username}}"
 									}
@@ -238,7 +238,7 @@
 						"method": "POST",
 						"header": [
 							{
-								"description": "(Required) Имя пользователя",
+								"description": "Имя пользователя",
 								"key": "X-User-Name",
 								"value": "{{username}}"
 							},
@@ -270,7 +270,7 @@
 								"method": "POST",
 								"header": [
 									{
-										"description": "(Required) Имя пользователя",
+										"description": "Имя пользователя",
 										"key": "X-User-Name",
 										"value": "{{username}}"
 									},
@@ -362,7 +362,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"description": "(Required) Имя пользователя",
+								"description": "Имя пользователя",
 								"key": "X-User-Name",
 								"value": "{{username}}"
 							}
@@ -394,7 +394,7 @@
 								"method": "GET",
 								"header": [
 									{
-										"description": "(Required) Имя пользователя",
+										"description": "Имя пользователя",
 										"key": "X-User-Name",
 										"value": "{{username}}"
 									}
@@ -504,7 +504,7 @@
 								"method": "GET",
 								"header": [
 									{
-										"description": "(Required) Имя пользователя",
+										"description": "Имя пользователя",
 										"key": "X-User-Name",
 										"value": "{{username}}"
 									}
@@ -588,7 +588,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"description": "(Required) Имя пользователя",
+								"description": "Имя пользователя",
 								"key": "X-User-Name",
 								"value": "{{username}}"
 							}
@@ -612,7 +612,7 @@
 								"method": "GET",
 								"header": [
 									{
-										"description": "(Required) Имя пользователя",
+										"description": "Имя пользователя",
 										"key": "X-User-Name",
 										"value": "{{username}}"
 									}
@@ -670,7 +670,7 @@
 						"method": "GET",
 						"header": [
 							{
-								"description": "(Required) Имя пользователя",
+								"description": "Имя пользователя",
 								"key": "X-User-Name",
 								"value": "{{username}}"
 							}
@@ -694,7 +694,7 @@
 								"method": "GET",
 								"header": [
 									{
-										"description": "(Required) Имя пользователя",
+										"description": "Имя пользователя",
 										"key": "X-User-Name",
 										"value": "{{username}}"
 									}
@@ -744,7 +744,7 @@
 						"method": "DELETE",
 						"header": [
 							{
-								"description": "(Required) Имя пользователя",
+								"description": "Имя пользователя",
 								"key": "X-User-Name",
 								"value": "{{username}}"
 							}
