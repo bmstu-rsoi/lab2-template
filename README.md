@@ -58,10 +58,7 @@
 ### Варианты заданий
 
 Варианты заданий берутся исходя из формулы:
-(номер в [списке группы](https://docs.google.com/spreadsheets/d/1BT5iLgERiWUPPn4gtOQk4KfHjVOTQbUS7ragAJrl6-Q) - 1) mod 4
-
-+
-    1.
+(номер в [списке группы](https://docs.google.com/spreadsheets/d/1BT5iLgERiWUPPn4gtOQk4KfHjVOTQbUS7ragAJrl6-Q)-1) % 4)+1.
 
 1. [Flight Booking System](v1/README.md)
 1. [Hotels Booking System](v2/README.md)
