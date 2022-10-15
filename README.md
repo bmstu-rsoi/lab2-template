@@ -21,8 +21,7 @@
 5. Gateway Service должен запускаться на порту 8080, остальные сервисы запускать на портах 8050, 8060, 8070.
 6. Каждый сервис должен быть завернут в docker.
 7. В [docker-compose.yml](docker-compose.yml) прописать сборку и запуск docker контейнеров.
-8. В [classroom.yml](.github/workflows/classroom.yml) дописать шаги на сборку, прогон unit-тестов и деплой каждого
-   сервиса на heroku.
+8. В [classroom.yml](.github/workflows/classroom.yml) дописать шаги на сборку и прогон unit-тестов.
 9. Для автоматических прогонов тестов в файле [autograding.json](.github/classroom/autograding.json)
    и [classroom.yml](.github/workflows/classroom.yml) заменить `<variant>` на ваш вариант.
 
