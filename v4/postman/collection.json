@@ -238,7 +238,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"page\": 1,\n    \"pageSize\": 1,\n    \"totalElements\": 1,\n    \"items\": [\n        {\n            \"bookUid\": \"f7cdc58f-2caf-4b15-9727-f89dcc629b27\",\n            \"name\": \"Краткий курс C++ в 7 томах\",\n            \"author\": \"Бьерн Страуструп\",\n            \"genre\": \"Научная фантастика\",\n            \"condition\": \"EXCELLENT\",\n            \"avaiblableCount\": 1\n        }\n    ]\n}"
+							"body": "{\n    \"page\": 1,\n    \"pageSize\": 1,\n    \"totalElements\": 1,\n    \"items\": [\n        {\n            \"bookUid\": \"f7cdc58f-2caf-4b15-9727-f89dcc629b27\",\n            \"name\": \"Краткий курс C++ в 7 томах\",\n            \"author\": \"Бьерн Страуструп\",\n            \"genre\": \"Научная фантастика\",\n            \"condition\": \"EXCELLENT\",\n            \"availableCount\": 1\n        }\n    ]\n}"
 						}
 					]
 				},
