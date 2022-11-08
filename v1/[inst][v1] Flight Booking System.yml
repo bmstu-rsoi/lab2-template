@@ -7,7 +7,7 @@ servers:
 paths:
   /api/v1/flights:
     get:
-      summary: Получить список рейстов
+      summary: Получить список рейсов
       tags:
         - Gateway API
       parameters:

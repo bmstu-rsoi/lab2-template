@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "6a65c85e-f601-4a7e-9d78-ef46b38321f1",
-		"name": "[rsoi] Flight Service",
+		"name": "[rsoi][lab2] Flight Service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -9,7 +9,7 @@
 			"name": "Gateway API",
 			"item": [
 				{
-					"name": "Получить список рейстов",
+					"name": "Получить список рейсов",
 					"event": [
 						{
 							"listen": "test",
