@@ -187,5 +187,5 @@ books:
 library_books:
   - book_id: 1
     library_id: 1
-    avaiblable_count: 1
+    available_count: 1
 ```
