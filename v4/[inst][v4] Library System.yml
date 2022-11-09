@@ -253,7 +253,7 @@ components:
               "author": "Бьерн Страуструп",
               "genre": "Научная фантастика",
               "condition": "EXCELLENT",
-              "avaiblableCount": 1
+              "availableCount": 1
             }
           ]
         }
@@ -281,7 +281,7 @@ components:
           "author": "Бьерн Страуструп",
           "genre": "Научная фантастика",
           "condition": "EXCELLENT",
-          "avaiblableCount": 1
+          "availableCount": 1
         }
       properties:
         bookUid:
@@ -304,7 +304,7 @@ components:
             - EXCELLENT
             - GOOD
             - BAD
-        avaiblableCount:
+        availableCount:
           type: number
           description: Количество книг, доступных для аренды в библиотеке
 
