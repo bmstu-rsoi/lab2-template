@@ -1,0 +1,89 @@
+# This file contains all available configuration options
+# with their default values.
+
+# options for analysis running
+run:
+  # timeout for analysis, e.g. 30s, 5m, default is 1m
+  deadline: 5m
+  # exit code when at least one issue was found, default is 1
+  issues-exit-code: 1
+  # include test files or not, default is true
+  tests: false
+  skip-dirs:
+    - "vendor"
+  skip-files:
+    - "\\/test\\/"
+
+# output configuration options
+output:
+  # colored-line-number|line-number|json|tab|checkstyle, default is "colored-line-number"
+  format: colored-line-number
+  # print lines of code with issue, default is true
+  print-issued-lines: true
+  # print linter name in the end of issue text, default is true
+  print-linter-name: true
+
+linters:
+  disable:
+    - depguard
+    - exhaustruct
+    - tagalign
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    - sql
+    - style
+    - test
+    - unused
+  fast: false
+
+linters-settings:
+  funlen:
+    # max func length.
+    lines: 80
+  lll:
+    # max line length, lines longer will be reported. Default is 120. '\t' is counted as 1 character.
+    line-length: 100
+  gocyclo:
+    # minimal code complexity to report, 30 by default (but we recommend 10-20)
+    min-complexity: 20
+  cyclop:
+    max-complexity: 20
+  golint:
+    # minimal confidence for issues, default is 0.8
+    min-confidence: 0.8
+  exhaustive:
+    default-signifies-exhaustive: true
+  gocritic:
+    disabled-checks:
+      - ifElseChain
+  wrapcheck:
+    ignoreSigs:
+      - .Errorf(
+      - .JSON(
+      - .NoContent(
+      - .NewHTTPError(
+      - .Redirect(
+  varnamelen:
+    max-distance: 6
+    min-name-length: 1
+    ignore-type-assert-ok: true
+    ignore-map-index-ok: true
+    ignore-chan-recv-ok: true
+  nonamedreturns:
+    report-error-in-defer: true
+  nestif:
+    min-complexity: 7
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/migregal/bmstu-iu7-ds-lab2)
+    custom-order: true

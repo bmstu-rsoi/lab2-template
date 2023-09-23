@@ -1,0 +1,12 @@
+with-expecter: True
+inpackage: True
+dir: ./{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
+mockname: "Mock{{.InterfaceName}}"
+outpkg: "{{.PackageName}}"
+filename: "mock_{{.InterfaceName }}.go"
+tags: testing
+all: True
+packages:
+  github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core:
+    config:
+      recursive: True
