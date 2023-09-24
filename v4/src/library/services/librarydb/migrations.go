@@ -8,6 +8,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/google/uuid"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
 )
 
@@ -16,7 +17,10 @@ type migrationItem struct {
 	model any
 }
 
-func runMigrations(lg *slog.Logger, db *gorm.DB, probe *readiness.Probe, interval time.Duration) {
+func runMigrations(
+	lg *slog.Logger, db *gorm.DB, probe *readiness.Probe,
+	interval time.Duration, enableTestData bool,
+) {
 	probe.Mark(probeKey, false)
 
 	for {
@@ -49,6 +53,10 @@ func runMigrations(lg *slog.Logger, db *gorm.DB, probe *readiness.Probe, interva
 		probe.Mark(probeKey, true)
 		lg.Warn("[startup] libraries db ready")
 	})()
+
+	if enableTestData {
+		initTestData(lg, db)
+	}
 }
 
 func migrateModels(lg *slog.Logger, db *gorm.DB, models []migrationItem) bool {
@@ -71,4 +79,32 @@ func migrateModels(lg *slog.Logger, db *gorm.DB, models []migrationItem) bool {
 	}
 
 	return true
+}
+
+func initTestData(lg *slog.Logger, db *gorm.DB) {
+	// data := Library{
+	// 	LibraryID: uuid.MustParse("83575e12-7ce0-48ee-9931-51919ff3c9ee"),
+	// 	Name:      "Библиотека имени 7 Непьющих",
+	// 	City:      "Москва",
+	// 	Address:   "2-я Бауманская ул., д.5, стр.1",
+	// }
+	data := LibraryBook{
+		LibraryRef: Library{
+			LibraryID: uuid.MustParse("83575e12-7ce0-48ee-9931-51919ff3c9ee"),
+			Name:      "Библиотека имени 7 Непьющих",
+			City:      "Москва",
+			Address:   "2-я Бауманская ул., д.5, стр.1",
+		},
+		BookRef: Book{
+			BookID:    uuid.MustParse("f7cdc58f-2caf-4b15-9727-f89dcc629b27"),
+			Name:      "Краткий курс C++ в 7 томах",
+			Author:    "Бьерн Страуструп",
+			Genre:     "Научная фантастика",
+			Condition: "EXCELLENT",
+		},
+		AvailableCount: 1,
+	}
+	if err := db.Create(&data).Error; err != nil {
+		lg.Error("failed to init test data", "error", err)
+	}
 }

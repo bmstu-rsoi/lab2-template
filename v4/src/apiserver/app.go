@@ -7,6 +7,7 @@ import (
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/api/http"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/config"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core"
+	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/services/library"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/apiutils"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
 )
@@ -22,7 +23,12 @@ func New(lg *slog.Logger, cfg *config.Config) (*App, error) {
 
 	probe := readiness.New()
 
-	core, err := core.New(lg, probe, nil, nil, nil)
+	libraryapi, err := library.New(lg, cfg.Library, probe)
+	if err != nil {
+		return nil, fmt.Errorf("failed to init library connection: %w", err)
+	}
+
+	core, err := core.New(lg, probe, libraryapi, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init core: %w", err)
 	}

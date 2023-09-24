@@ -26,7 +26,7 @@ func ReadConfig() (*Config, error) {
 
 	viper.SetDefault("http_addr", ":8080")
 	viper.SetDefault("library.host", "library")
-	viper.SetDefault("librabry.port", "8060")
+	viper.SetDefault("library.port", "8060")
 	viper.SetDefault("rating.host", "library")
 	viper.SetDefault("rating.port", "8050")
 	viper.SetDefault("reservation.host", "reservation")

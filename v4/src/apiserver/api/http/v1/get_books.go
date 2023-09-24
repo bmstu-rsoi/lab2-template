@@ -7,20 +7,31 @@ import (
 )
 
 type BooksRequest struct {
-	PaginatedRequest
+	PaginatedRequest `valid:"optional"`
 
-	ShawAll   bool   `query:"showAll" valid:"optional"`
-	LibraryID string `param:"libraryUid" valid:"uuidv4,required"`
+	ShowAll   bool   `query:"showAll" valid:"optional"`
+	LibraryID string `param:"id" valid:"uuidv4,required"`
 }
 
 type BooksResponse struct {
 	PaginatedResponse
 
-	Items    []Library `json:"items"`
+	Items []Book `json:"items"`
 }
 
 func (a *api) GetLibraryBooks(c echo.Context, req BooksRequest) error {
-	resp := BooksResponse{}
+	books, err := a.core.GetLibraryBooks(c.Request().Context(), req.LibraryID, req.ShowAll, req.Page, req.Size)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	resp := BooksResponse{Items: []Book{}}
+	for _, book := range books.Books {
+		resp.Items = append(resp.Items, Book(book))
+	}
+	resp.Page = req.Page
+	resp.PageSize = req.Size
+	resp.Total = books.Total
 
 	return c.JSON(http.StatusOK, &resp)
 }

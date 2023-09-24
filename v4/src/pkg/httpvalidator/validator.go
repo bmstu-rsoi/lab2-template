@@ -2,6 +2,7 @@ package httpvalidator
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,19 @@ import (
 
 func init() {
 	valid.SetFieldsRequiredByDefault(true)
+
+	valid.TagMap["positive_uint"] = valid.Validator(func(str string) bool {
+		v, err := strconv.ParseUint(str, 10, 64)
+		if err != nil {
+			return false
+		}
+
+		if uint64(v) == 0 {
+			return false
+		}
+
+		return true
+	})
 }
 
 type CustomValidator struct{}

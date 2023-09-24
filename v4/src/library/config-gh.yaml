@@ -6,3 +6,4 @@ libraries:
   user: program
   password: test
   database: libraries
+  enable_test_data: true

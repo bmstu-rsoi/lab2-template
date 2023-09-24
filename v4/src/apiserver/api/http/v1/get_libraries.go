@@ -7,7 +7,7 @@ import (
 )
 
 type LibrariesRequest struct {
-	PaginatedRequest
+	PaginatedRequest `valid:"optional"`
 
 	City string `query:"city" valid:"required"`
 }

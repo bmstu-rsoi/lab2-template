@@ -7,13 +7,11 @@ type AuthedRequest struct {
 }
 
 type PaginatedRequest struct {
-	Page uint64 `query:"page" valid:"non_negative,optional"`
+	Page uint64 `query:"page" valid:"positive_uint,optional"`
 	Size uint64 `query:"size" valid:"range(0|100),optional"`
 }
 
 type PaginatedResponse struct {
-	Page     uint64 `json:"page"`
-	PageSize uint64 `json:"pageSize"`
 	Total    uint64 `json:"totalElements"`
 }
 

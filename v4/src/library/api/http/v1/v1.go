@@ -1,13 +1,16 @@
 package v1
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/migregal/bmstu-iu7-ds-lab2/library/core/ports/libraries"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/httpvalidator"
 )
 
 type Core interface {
+	GetLibraryBooks(context.Context, string, bool, uint64, uint64) (libraries.LibraryBooks, error)
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
