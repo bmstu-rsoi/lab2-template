@@ -13,8 +13,103 @@ services:
       - ./postgres/:/docker-entrypoint-initdb.d/
     ports:
       - "5432:5432"
+    networks:
+      - database
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-# TODO добавить сервисы
+  library:
+    image: migregal/library-libraryapi:${TAG}
+    build:
+      context: .
+      dockerfile: v4/src/docker/library/Dockerfile
+    container_name: library
+    ports:
+      - "8060:8060"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./v4/src/library/config-gh.yaml:/usr/local/etc/library/config.yaml
+    networks:
+      - library
+      - database
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://library:8060/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
+  reservation:
+    image: migregal/library-reservationapi:${TAG}
+    build:
+      context: .
+      dockerfile: v4/src/docker/reservation/Dockerfile
+    container_name: reservation
+    ports:
+      - "8070:8070"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./v4/src/reservation/config-gh.yaml:/usr/local/etc/reservation/config.yaml
+    networks:
+      - reservation
+      - database
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://reservation:8070/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
+  apiserver:
+    image: migregal/library-apiserver:${TAG}
+    build:
+      context: .
+      dockerfile: v4/src/docker/apiserver/Dockerfile
+    container_name: apiserver
+    ports:
+      - "8080:8080"
+    depends_on:
+      library:
+        condition: service_healthy
+      reservation:
+        condition: service_healthy
+    volumes:
+      - ./v4/src/apiserver/config-gh.yaml:/usr/local/etc/apiserver/config.yaml
+    networks:
+      - api-gateaway
+      - library
+      - reservation
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://apiserver:8080/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
 
 volumes:
   db-data:
+
+networks:
+  api-gateaway:
+    driver: bridge
+
+  library:
+    driver: bridge
+    internal: true
+
+  reservation:
+    driver: bridge
+    internal: true
+
+  database:
+    driver: bridge
+    internal: true
