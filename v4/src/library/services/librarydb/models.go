@@ -27,9 +27,10 @@ type Book struct {
 type LibraryBook struct {
 	gorm.Model
 
-	BookID uint32
-	Book
-	LibraryID uint32
-	Library
+	FkBookID    uint
+	BookRef     Book `gorm:"foreignkey:FkBookID;references:id"`
+	FkLibraryID uint
+	LibraryRef  Library `gorm:"foreignkey:FkLibraryID;references:id"`
+
 	AvailableCount uint32 `gorm:"not null"`
 }
