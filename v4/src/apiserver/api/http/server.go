@@ -9,7 +9,7 @@ import (
 
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/api/http/common"
 	v1 "github.com/migregal/bmstu-iu7-ds-lab2/apiserver/api/http/v1"
-	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/api/http/validator"
+	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/httpvalidator"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
 )
 
@@ -37,7 +37,7 @@ func New(_ *slog.Logger, probe *readiness.Probe, core Core) (*Server, error) {
 		// fmt.Println(c.Path(), c.QueryParams(), err.Error())
 		mx.DefaultHTTPErrorHandler(err, c)
 	}
-	mx.Validator = &validator.CustomValidator{}
+	mx.Validator = &httpvalidator.CustomValidator{}
 
 	s := Server{mx: mx}
 

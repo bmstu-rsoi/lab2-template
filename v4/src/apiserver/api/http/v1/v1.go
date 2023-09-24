@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/api/http/validator"
+	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/httpvalidator"
 )
 
 type Core interface {
@@ -40,7 +40,7 @@ func WrapRequest[T any](handler func(echo.Context, T) error) func(echo.Context) 
 		if err := c.Validate(req); err != nil {
 			resp := ValidationErrorResponse{
 				http.StatusText(http.StatusBadRequest),
-				validator.ParseErrors(err),
+				httpvalidator.ParseErrors(err),
 			}
 
 			return c.JSON(http.StatusBadRequest, resp)

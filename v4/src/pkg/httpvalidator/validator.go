@@ -1,4 +1,4 @@
-package validator
+package httpvalidator
 
 import (
 	"net/http"
