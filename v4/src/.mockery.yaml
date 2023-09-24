@@ -13,3 +13,6 @@ packages:
   github.com/migregal/bmstu-iu7-ds-lab2/library/core:
     config:
       recursive: True
+  github.com/migregal/bmstu-iu7-ds-lab2/reservation/core:
+    config:
+      recursive: True
