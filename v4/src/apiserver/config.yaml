@@ -1,0 +1,5 @@
+http_addr: ":8080"
+
+libraries:
+  host: localhost
+  port: 8060

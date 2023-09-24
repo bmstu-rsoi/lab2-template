@@ -1,8 +1,8 @@
-http_addr: ":8080"
+http_addr: ":8060"
 
-persons:
+libraries:
   host: localhost
   port: 5432
   user: program
   password: test
-  database: persons
+  database: libraries
