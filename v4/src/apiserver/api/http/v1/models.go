@@ -1,6 +1,11 @@
 package v1
 
-import "github.com/migregal/bmstu-iu7-ds-lab2/pkg/httpvalidator"
+import (
+	"strings"
+	"time"
+
+	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/httpvalidator"
+)
 
 type AuthedRequest struct {
 	Username string `header:"X-User-Name" valid:"required"`
@@ -42,6 +47,20 @@ type Rating struct {
 }
 
 type ValidationErrorResponse struct {
-	Message string `json:"message"`
+	Message string                          `json:"message"`
 	Errors  []httpvalidator.ValidationError `json:"errors"`
+}
+
+type Time struct {
+	time.Time `valid:"required"`
+}
+
+func (ct *Time) UnmarshalJSON(b []byte) (err error) {
+	s := strings.Trim(string(b), "\"")
+	if s == "null" {
+		ct.Time = time.Time{}
+		return
+	}
+	ct.Time, err = time.Parse(time.DateOnly, s)
+	return
 }

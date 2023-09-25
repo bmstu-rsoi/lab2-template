@@ -105,8 +105,20 @@ func (c *Client) GetUserReservations(
 
 	reservs := []reservation.Reservation{}
 	for _, res := range resp {
-		reservs = append(reservs, reservation.Reservation(res))
+		reservs = append(reservs, reservation.Reservation{
+			ID:        res.ID,
+			Username:  username,
+			Status:    res.Status,
+			Start:     res.Start,
+			End:       res.End,
+			LibraryID: res.LibraryID,
+			BookID:    res.BookID,
+		})
 	}
 
 	return reservs, nil
+}
+
+func (c *Client) AddUserReservation(ctx context.Context, res reservation.Reservation) (string, error) {
+	return "", nil
 }

@@ -169,3 +169,7 @@ func (c *Client) GetBooks(
 
 	return books, nil
 }
+
+func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string) error {
+	return nil
+}

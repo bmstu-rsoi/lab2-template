@@ -9,4 +9,5 @@ type Config struct {
 
 type Client interface {
 	GetUserReservations(ctx context.Context, username, status string) ([]Reservation, error)
+	AddUserReservation(ctx context.Context, res Reservation) (string, error)
 }

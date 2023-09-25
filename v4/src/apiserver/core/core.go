@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/library"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/rating"
@@ -61,4 +62,35 @@ func (c *Core) GetUserReservations(
 	}
 
 	return resvs, nil
+}
+
+func (c *Core) TakeBook(
+	ctx context.Context, username, libraryID, bookID string, end time.Time,
+) error {
+	resvs, err := c.reservation.GetUserReservations(ctx, username, "RENTED")
+	if err != nil {
+		return fmt.Errorf("failed to get user reservations: %w", err)
+	}
+
+	_ = len(resvs) // TODO: check me via rating system
+
+	err = c.library.ObtainBook(ctx, libraryID, bookID)
+	if err != nil {
+		return fmt.Errorf("failed to obtain book from library: %w", err)
+	}
+
+	res := reservation.Reservation{
+		Username:  username,
+		Status:    "RENTED",
+		Start:     time.Now(),
+		End:       end,
+		LibraryID: libraryID,
+		BookID:    bookID,
+	}
+	_, err = c.reservation.AddUserReservation(ctx, res)
+	if err != nil {
+		return fmt.Errorf("failed add reservation for obtained book: %w", err)
+	}
+
+	return nil
 }

@@ -10,9 +10,9 @@ import (
 
 type TakeBookRequest struct {
 	AuthedRequest `valid:"optional"`
-	BookID        string    `json:"bookUid" valid:"uuidv4,required"`
-	LibraryID     string    `json:"libraryUid" valid:"uuidv4,required"`
-	End           time.Time `json:"tillDate" valid:"required"`
+	BookID        string `json:"bookUid" valid:"uuidv4,required"`
+	LibraryID     string `json:"libraryUid" valid:"uuidv4,required"`
+	End           Time   `json:"tillDate" valid:"required"`
 }
 
 func (r TakeBookRequest) MarshalJSON() ([]byte, error) {
@@ -50,6 +50,13 @@ func (r TakeBookResponse) MarshalJSON() ([]byte, error) {
 }
 
 func (a *api) TakeBook(c echo.Context, req TakeBookRequest) error {
+	err := a.core.TakeBook(
+		c.Request().Context(), req.Username, req.LibraryID, req.BookID, req.End.Time,
+	)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
 	resp := TakeBookResponse{}
 
 	return c.JSON(http.StatusOK, &resp)

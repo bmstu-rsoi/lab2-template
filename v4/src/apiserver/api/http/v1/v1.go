@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/library"
@@ -14,6 +15,7 @@ type Core interface {
 	GetLibraries(context.Context, string, uint64, uint64) (library.Libraries, error)
 	GetLibraryBooks(context.Context, string, bool, uint64, uint64) (library.LibraryBooks, error)
 	GetUserReservations(context.Context, string) ([]reservation.Reservation, error)
+	TakeBook(ctx context.Context, usename, libraryID, bookID string, end time.Time) error
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
