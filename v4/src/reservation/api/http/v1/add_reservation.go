@@ -21,7 +21,7 @@ type AddReservationResponse struct {
 }
 
 func (a *api) AddReservation(c echo.Context, req ReservationsRequest) error {
-	resp := ReservationsResponse{}
+	resp := AddReservationResponse{}
 
 	return c.JSON(http.StatusOK, &resp)
 }

@@ -16,5 +16,6 @@ type Config struct {
 }
 
 type Client interface {
+	GetLibraries(ctx context.Context, city string, page uint64, size uint64) (Libraries, error)
 	GetLibraryBooks(ctx context.Context, libraryID string, showAll bool, page uint64, size uint64) (LibraryBooks, error)
 }

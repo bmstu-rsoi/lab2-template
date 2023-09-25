@@ -7,7 +7,7 @@ import (
 )
 
 type LibrariesRequest struct {
-	PaginatedRequest
+	PaginatedRequest `valid:"optional"`
 
 	City string `query:"city" valid:"required"`
 }
@@ -19,7 +19,16 @@ type LibrariesResponse struct {
 }
 
 func (a *api) GetLibraries(c echo.Context, req LibrariesRequest) error {
-	resp := LibrariesResponse{}
+	data, err := a.core.GetLibraries(c.Request().Context(), req.City, req.Page, req.Size)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	resp := LibrariesResponse{Items: []Library{}}
+	resp.Total = data.Total
+	for _, lib := range data.Items {
+		resp.Items = append(resp.Items, Library(lib))
+	}
 
 	return c.JSON(http.StatusOK, &resp)
 }

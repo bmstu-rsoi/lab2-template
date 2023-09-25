@@ -27,7 +27,7 @@ func ReadConfig() (*Config, error) {
 	viper.SetDefault("libraries.host", "localhost")
 	viper.SetDefault("libraries.port", "5432")
 	viper.SetDefault("libraries.migration_interval", "10s")
-	viper.SetDefault("libraries.enable_test_data", "true")
+	viper.SetDefault("libraries.enable_test_data", "false")
 
 	err := viper.ReadInConfig()
 	if err != nil {

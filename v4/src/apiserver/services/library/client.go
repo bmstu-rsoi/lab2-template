@@ -72,6 +72,54 @@ func (c *Client) ping(probe *readiness.Probe) {
 	}()
 }
 
+func (c *Client) GetLibraries(
+	ctx context.Context, city string, page uint64, size uint64,
+) (library.Libraries, error) {
+	url := fmt.Sprintf("http://%s/api/v1/libraries", c.addr)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return library.Libraries{}, fmt.Errorf("failed to init http request: %w", err)
+	}
+
+	q := req.URL.Query()
+	q.Add("city", city)
+	q.Add("page", strconv.FormatUint(page, 10))
+	if size == 0 {
+		size = math.MaxUint64
+	}
+	q.Add("size", strconv.FormatUint(size, 10))
+	req.URL.RawQuery = q.Encode()
+
+	res, err := c.conn.Do(req)
+	if err != nil {
+		return library.Libraries{}, fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return library.Libraries{}, fmt.Errorf("invalid status code: %d", res.StatusCode)
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return library.Libraries{}, fmt.Errorf("failed to read http ersponse")
+	}
+
+	var resp v1.LibrariesResponse
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return library.Libraries{}, fmt.Errorf("failed to parse http ersponse")
+	}
+
+	books := library.Libraries{Total: resp.Total}
+	for _, book := range resp.Items {
+		books.Items = append(books.Items, library.Library(book))
+	}
+
+	return books, nil
+}
+
 func (c *Client) GetBooks(
 	ctx context.Context, libraryID string, showAll bool, page uint64, size uint64,
 ) (library.LibraryBooks, error) {
@@ -116,7 +164,7 @@ func (c *Client) GetBooks(
 
 	books := library.LibraryBooks{Total: resp.Total}
 	for _, book := range resp.Items {
-		books.Books = append(books.Books, library.Book(book))
+		books.Items = append(books.Items, library.Book(book))
 	}
 
 	return books, nil

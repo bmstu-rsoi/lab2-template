@@ -20,6 +20,17 @@ func New(lg *slog.Logger, probe *readiness.Probe, library libraries.Client) (*Co
 	return &Core{libraries: library}, nil
 }
 
+func (c *Core) GetLibraries(
+	ctx context.Context, city string, page uint64, size uint64,
+) (libraries.Libraries, error) {
+	books, err := c.libraries.GetLibraries(ctx, city, page, size)
+	if err != nil {
+		return libraries.Libraries{}, fmt.Errorf("failed to get books: %w", err)
+	}
+
+	return books, nil
+}
+
 func (c *Core) GetLibraryBooks(
 	ctx context.Context, libraryID string, showAll bool, page uint64, size uint64,
 ) (libraries.LibraryBooks, error) {

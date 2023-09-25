@@ -11,6 +11,7 @@ import (
 
 type Core interface {
 	GetLibraryBooks(context.Context, string, bool, uint64, uint64) (libraries.LibraryBooks, error)
+	GetLibraries(context.Context, string, uint64, uint64) (libraries.Libraries, error)
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
@@ -30,8 +31,13 @@ type api struct {
 
 func WrapRequest[T any](handler func(echo.Context, T) error) func(echo.Context) error {
 	return func(c echo.Context) error {
+		binder := &echo.DefaultBinder{}
+
 		var req T
-		if err := c.Bind(&req); err != nil {
+		if err := binder.Bind(&req, c); err != nil {
+			return c.String(http.StatusBadRequest, "bad request")
+		}
+		if err := binder.BindHeaders(c, &req); err != nil {
 			return c.String(http.StatusBadRequest, "bad request")
 		}
 		if err := c.Validate(req); err != nil {

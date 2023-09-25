@@ -1,6 +1,8 @@
 package reservationdb
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -13,4 +15,6 @@ type Reservation struct {
 	BookID        uuid.UUID `gorm:"column:book_uid;type:uuid;not null;<-:create"`
 	LibraryID     uuid.UUID `gorm:"column:library_uid;type:uuid;not null;<-:create"`
 	Status        string    `gorm:"size:20;check:status in ('RENTED', 'RETURNED', 'EXPIRED')"`
+	Start         time.Time `gorm:"column:start_date;not null"`
+	End           time.Time `gorm:"column:till_date;not null"`
 }

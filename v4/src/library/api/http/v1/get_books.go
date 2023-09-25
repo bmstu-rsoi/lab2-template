@@ -27,7 +27,7 @@ func (a *api) GetLibraryBooks(c echo.Context, req BooksRequest) error {
 
 	resp := BooksResponse{Items: []Book{}}
 	resp.Total = data.Total
-	for _, book := range data.Books {
+	for _, book := range data.Items {
 		resp.Items = append(resp.Items, Book(book))
 	}
 

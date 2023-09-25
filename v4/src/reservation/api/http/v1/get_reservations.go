@@ -12,7 +12,7 @@ type ReservationsRequest struct {
 	AuthedRequest `valid:"optional"`
 }
 
-type ReservationsResponse struct {
+type Reservation struct {
 	ID        string    `json:"reservationUid" valid:"uuidv4,required"`
 	Status    string    `json:"status," valid:"in(RENTED,RETURNED,EXPIRED)"`
 	Start     time.Time `json:"-"`
@@ -21,8 +21,8 @@ type ReservationsResponse struct {
 	LibraryID string    `json:"library_id"`
 }
 
-func (r ReservationsResponse) MarshalJSON() ([]byte, error) {
-	type Alias ReservationsResponse
+func (r Reservation) MarshalJSON() ([]byte, error) {
+	type Alias Reservation
 	return json.Marshal(&struct {
 		Alias
 		Start string `json:"startDate"`
@@ -34,8 +34,18 @@ func (r ReservationsResponse) MarshalJSON() ([]byte, error) {
 	})
 }
 
+
 func (a *api) GetReservations(c echo.Context, req ReservationsRequest) error {
-	resp := ReservationsResponse{}
+	data, err := a.core.GetUserReservations(c.Request().Context(), req.Username)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	resp := []Reservation{}
+	for _, res := range data {
+		resp = append(resp, Reservation(res))
+	}
+
 
 	return c.JSON(http.StatusOK, &resp)
 }

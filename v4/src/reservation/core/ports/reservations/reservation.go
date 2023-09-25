@@ -1,6 +1,9 @@
 package reservations
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type Config struct {
 	User              string
@@ -12,4 +15,5 @@ type Config struct {
 }
 
 type Client interface {
+	GetUserReservations(ctx context.Context, username string) ([]Reservation, error)
 }

@@ -26,7 +26,7 @@ func (a *api) GetLibraryBooks(c echo.Context, req BooksRequest) error {
 	}
 
 	resp := BooksResponse{Items: []Book{}}
-	for _, book := range books.Books {
+	for _, book := range books.Items {
 		resp.Items = append(resp.Items, Book(book))
 	}
 	resp.Page = req.Page

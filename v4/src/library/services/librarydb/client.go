@@ -35,16 +35,60 @@ func New(lg *slog.Logger, cfg libraries.Config, probe *readiness.Probe) (*DB, er
 	return &DB{db: db}, nil
 }
 
+func (d *DB) GetLibraries(
+	ctx context.Context, city string, page uint64, size uint64,
+) (resp libraries.Libraries, err error) {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
+
+	stmt := tx.Offset(int((page - 1) * size)).Limit(int(size))
+	if city != "" {
+		stmt = stmt.Where("city = ?", city)
+	}
+
+	var libs []Library
+	if err := stmt.Find(&libs).Error; err != nil {
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to find libraries info: %w", err)
+	}
+
+	stmt = tx.Model(&Library{})
+	if city != "" {
+		stmt = stmt.Where("city = ?", city)
+	}
+
+	var count int64
+	if err := stmt.Count(&count).Error; err != nil {
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to count libraries: %w", err)
+	}
+
+	resp.Total = uint64(count)
+	for _, lib := range libs {
+		resp.Items = append(resp.Items, libraries.Library{
+			ID:      lib.LibraryID.String(),
+			Name:    lib.Name,
+			Address: lib.Address,
+			City:    lib.City,
+		})
+	}
+
+	tx.Commit()
+
+	return resp, nil
+}
+
 func (d *DB) GetLibraryBooks(
 	ctx context.Context, libraryID string, showAll bool, page uint64, size uint64,
-) (libraries.LibraryBooks, error) {
+) (resp libraries.LibraryBooks, err error) {
 	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
 
 	var lib Library
 	if err := tx.Where("library_uid = ?", libraryID).First(&lib).Error; err != nil {
 		tx.Rollback()
 
-		return libraries.LibraryBooks{}, fmt.Errorf("failed to find linrary info: %w", err)
+		return resp, fmt.Errorf("failed to find library info: %w", err)
 	}
 
 	stmt := tx.Model(&LibraryBook{}).Where("fk_library_id = ?", lib.ID)
@@ -56,7 +100,7 @@ func (d *DB) GetLibraryBooks(
 	if err := stmt.Count(&count).Error; err != nil {
 		tx.Rollback()
 
-		return libraries.LibraryBooks{}, fmt.Errorf("failed to count library books info: %w", err)
+		return resp, fmt.Errorf("failed to count library books info: %w", err)
 	}
 
 	stmt = tx.Offset(int((page-1)*size)).Limit(int(size)).Where("fk_library_id = ?", lib.ID)
@@ -68,12 +112,12 @@ func (d *DB) GetLibraryBooks(
 	if err := stmt.Preload("BookRef").Find(&libraryBooks).Error; err != nil {
 		tx.Rollback()
 
-		return libraries.LibraryBooks{}, fmt.Errorf("failed to select library books info: %w", err)
+		return resp, fmt.Errorf("failed to select library books info: %w", err)
 	}
 
-	resp := libraries.LibraryBooks{Total: uint64(count)}
+	resp.Total = uint64(count)
 	for _, book := range libraryBooks {
-		resp.Books = append(resp.Books, libraries.Book{
+		resp.Items = append(resp.Items, libraries.Book{
 			ID:        book.BookRef.BookID.String(),
 			Name:      book.BookRef.Name,
 			Author:    book.BookRef.Author,

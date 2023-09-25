@@ -1,6 +1,8 @@
 package reservationdb
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 
@@ -31,4 +33,33 @@ func New(lg *slog.Logger, cfg reservations.Config, probe *readiness.Probe) (*DB,
 	go runMigrations(lg, db, probe, cfg.MigrationInterval)
 
 	return &DB{db: db}, nil
+}
+
+func (d *DB) GetUserReservations(
+	ctx context.Context, username string,
+) ([]reservations.Reservation, error) {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
+
+	var data []reservations.Reservation
+	if err := tx.Where("username = ?", username).Find(&data).Error; err != nil {
+		tx.Rollback()
+
+		return nil, fmt.Errorf("failed to find reservations info: %w", err)
+	}
+
+	resp := []reservations.Reservation{}
+	for _, res := range data {
+		resp = append(resp, reservations.Reservation{
+			ID:        res.ID,
+			Status:    res.Status,
+			Start:     res.Start,
+			End:       res.End,
+			BookID:    res.BookID,
+			LibraryID: res.LibraryID,
+		})
+	}
+
+	tx.Commit()
+
+	return resp, nil
 }

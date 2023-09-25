@@ -6,11 +6,14 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/library"
+	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/reservation"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/httpvalidator"
 )
 
 type Core interface {
+	GetLibraries(context.Context, string, uint64, uint64) (library.Libraries, error)
 	GetLibraryBooks(context.Context, string, bool, uint64, uint64) (library.LibraryBooks, error)
+	GetUserReservations(context.Context, string) ([]reservation.Reservation, error)
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
@@ -36,8 +39,13 @@ type api struct {
 
 func WrapRequest[T any](handler func(echo.Context, T) error) func(echo.Context) error {
 	return func(c echo.Context) error {
+		binder := &echo.DefaultBinder{}
+
 		var req T
-		if err := c.Bind(&req); err != nil {
+		if err := binder.Bind(&req, c); err != nil {
+			return c.String(http.StatusBadRequest, "bad request")
+		}
+		if err := binder.BindHeaders(c, &req); err != nil {
 			return c.String(http.StatusBadRequest, "bad request")
 		}
 		if err := c.Validate(req); err != nil {

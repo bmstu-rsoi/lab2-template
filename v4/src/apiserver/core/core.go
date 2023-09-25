@@ -29,6 +29,16 @@ func New(
 	return &Core{lg: lg, library: library, rating: rating, reservation: reservation}, nil
 }
 
+func (c *Core) GetLibraries(ctx context.Context, city string, page uint64, size uint64) (library.Libraries, error) {
+	data, err := c.library.GetLibraries(ctx, city, page, size)
+	if err != nil {
+		c.lg.ErrorContext(ctx, "failed to get list of libraries", "error", err)
+		return library.Libraries{}, fmt.Errorf("failed to get list of libraries: %w", err)
+	}
+
+	return data, nil
+}
+
 func (c *Core) GetLibraryBooks(
 	ctx context.Context, libraryID string, showAll bool, page uint64, size uint64,
 ) (library.LibraryBooks, error) {
@@ -39,4 +49,16 @@ func (c *Core) GetLibraryBooks(
 	}
 
 	return books, nil
+}
+
+func (c *Core) GetUserReservations(
+	ctx context.Context, username string,
+) ([]reservation.Reservation, error) {
+	resvs, err := c.reservation.GetUserReservations(ctx, username)
+	if err != nil {
+		c.lg.ErrorContext(ctx, "failed to get list of user reservations", "error", err)
+		return nil, fmt.Errorf("failed to get list of user reservations: %w", err)
+	}
+
+	return resvs, nil
 }
