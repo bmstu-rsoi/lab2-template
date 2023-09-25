@@ -54,7 +54,7 @@ func (c *Core) GetLibraryBooks(
 func (c *Core) GetUserReservations(
 	ctx context.Context, username string,
 ) ([]reservation.Reservation, error) {
-	resvs, err := c.reservation.GetUserReservations(ctx, username)
+	resvs, err := c.reservation.GetUserReservations(ctx, username, "")
 	if err != nil {
 		c.lg.ErrorContext(ctx, "failed to get list of user reservations", "error", err)
 		return nil, fmt.Errorf("failed to get list of user reservations: %w", err)

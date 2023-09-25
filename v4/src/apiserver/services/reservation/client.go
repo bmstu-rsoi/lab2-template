@@ -71,7 +71,7 @@ func (c *Client) ping(probe *readiness.Probe) {
 }
 
 func (c *Client) GetUserReservations(
-	ctx context.Context, username string,
+	ctx context.Context, username, status string,
 ) ([]reservation.Reservation, error) {
 	url := fmt.Sprintf("http://%s/api/v1/reservations", c.addr)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

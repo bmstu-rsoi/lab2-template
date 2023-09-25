@@ -36,12 +36,16 @@ func New(lg *slog.Logger, cfg reservations.Config, probe *readiness.Probe) (*DB,
 }
 
 func (d *DB) GetUserReservations(
-	ctx context.Context, username string,
+	ctx context.Context, username, status string,
 ) ([]reservations.Reservation, error) {
 	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
 
 	var data []reservations.Reservation
-	if err := tx.Where("username = ?", username).Find(&data).Error; err != nil {
+	stmt := tx.Where("username = ?", username)
+	if status != "" {
+		stmt = stmt.Where("status = ?", status)
+	}
+	if err := stmt.Find(&data).Error; err != nil {
 		tx.Rollback()
 
 		return nil, fmt.Errorf("failed to find reservations info: %w", err)

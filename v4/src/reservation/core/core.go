@@ -21,9 +21,9 @@ func New(lg *slog.Logger, probe *readiness.Probe, reservation reservations.Clien
 }
 
 func (c *Core) GetUserReservations(
-	ctx context.Context, username string,
+	ctx context.Context, username, status string,
 ) ([]reservations.Reservation, error) {
-	data, err := c.reservations.GetUserReservations(ctx, username)
+	data, err := c.reservations.GetUserReservations(ctx, username, status)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get list of user reservations: %w", err)
 	}

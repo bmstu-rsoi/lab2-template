@@ -10,11 +10,13 @@ import (
 
 type ReservationsRequest struct {
 	AuthedRequest `valid:"optional"`
+
+	Status string `query:"status" valid:"in(RENTED,RETURNED,EXPIRED),optional"`
 }
 
 type Reservation struct {
 	ID        string    `json:"reservationUid" valid:"uuidv4,required"`
-	Status    string    `json:"status," valid:"in(RENTED,RETURNED,EXPIRED)"`
+	Status    string    `json:"status" valid:"in(RENTED,RETURNED,EXPIRED)"`
 	Start     time.Time `json:"-"`
 	End       time.Time `json:"-"`
 	BookID    string    `json:"book_id"`
@@ -34,9 +36,8 @@ func (r Reservation) MarshalJSON() ([]byte, error) {
 	})
 }
 
-
 func (a *api) GetReservations(c echo.Context, req ReservationsRequest) error {
-	data, err := a.core.GetUserReservations(c.Request().Context(), req.Username)
+	data, err := a.core.GetUserReservations(c.Request().Context(), req.Username, req.Status)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
@@ -45,7 +46,6 @@ func (a *api) GetReservations(c echo.Context, req ReservationsRequest) error {
 	for _, res := range data {
 		resp = append(resp, Reservation(res))
 	}
-
 
 	return c.JSON(http.StatusOK, &resp)
 }

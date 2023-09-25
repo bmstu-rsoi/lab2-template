@@ -10,7 +10,7 @@ import (
 )
 
 type Core interface {
-	GetUserReservations(context.Context, string) ([]reservations.Reservation, error)
+	GetUserReservations(context.Context, string, string) ([]reservations.Reservation, error)
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
