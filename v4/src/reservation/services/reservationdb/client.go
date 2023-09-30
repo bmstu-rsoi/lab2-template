@@ -40,7 +40,7 @@ func (d *DB) GetUserReservations(
 ) ([]reservations.Reservation, error) {
 	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
 
-	var data []reservations.Reservation
+	var data []Reservation
 	stmt := tx.Where("username = ?", username)
 	if status != "" {
 		stmt = stmt.Where("status = ?", status)
@@ -54,12 +54,12 @@ func (d *DB) GetUserReservations(
 	resp := []reservations.Reservation{}
 	for _, res := range data {
 		resp = append(resp, reservations.Reservation{
-			ID:        res.ID,
+			ID:        res.ReservationID.String(),
 			Status:    res.Status,
 			Start:     res.Start,
 			End:       res.End,
-			BookID:    res.BookID,
-			LibraryID: res.LibraryID,
+			BookID:    res.BookID.String(),
+			LibraryID: res.LibraryID.String(),
 		})
 	}
 
