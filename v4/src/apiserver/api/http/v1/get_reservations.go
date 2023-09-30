@@ -40,5 +40,16 @@ func (a *api) GetReservations(c echo.Context, req ReservationsRequest) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.JSON(http.StatusOK, &data)
+	resp := make([]ReservationsResponse, 0, len(data))
+	for _, v := range data {
+		// TODO: ad book & library info
+		resp = append(resp, ReservationsResponse{
+			ID:     v.ID,
+			Status: v.Status,
+			Start:  v.Start,
+			End:    v.End,
+		})
+	}
+
+	return c.JSON(http.StatusOK, &resp)
 }

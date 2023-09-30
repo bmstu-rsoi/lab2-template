@@ -25,7 +25,7 @@ func (a *api) GetLibraryBooks(c echo.Context, req BooksRequest) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	resp := BooksResponse{Items: []Book{}}
+	resp := BooksResponse{Items: make([]Book, 0, len(books.Items))}
 	for _, book := range books.Items {
 		resp.Items = append(resp.Items, Book(book))
 	}

@@ -24,7 +24,7 @@ func (a *api) GetLibraries(c echo.Context, req LibrariesRequest) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	resp := LibrariesResponse{Items: []Library{}}
+	resp := LibrariesResponse{Items: make([]Library, 0, len(data.Items))}
 	for _, lib := range data.Items {
 		resp.Items = append(resp.Items, Library(lib))
 	}
