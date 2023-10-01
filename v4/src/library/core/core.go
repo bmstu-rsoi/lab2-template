@@ -41,3 +41,7 @@ func (c *Core) GetLibraryBooks(
 
 	return books, nil
 }
+
+func (c *Core) TakeBook(context.Context, string, string) error {
+	return nil
+}

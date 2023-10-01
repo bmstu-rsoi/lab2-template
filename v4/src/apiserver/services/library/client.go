@@ -1,6 +1,7 @@
 package library
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -171,5 +172,49 @@ func (c *Client) GetBooks(
 }
 
 func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string) (library.ReservedBook, error) {
-	return library.ReservedBook{}, nil
+	var reqReader io.Reader
+	{
+		body, err := json.Marshal(v1.TakeBookRequest{
+			BookID:    bookID,
+			LibraryID: libraryID,
+		})
+		if err != nil {
+			return library.ReservedBook{}, fmt.Errorf("failed to format json body: %w", err)
+		}
+
+		reqReader = bytes.NewBuffer(body)
+	}
+
+	url := fmt.Sprintf("http://%s/api/v1/books", c.addr)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, reqReader)
+	if err != nil {
+		return library.ReservedBook{}, fmt.Errorf("failed to init http request: %w", err)
+	}
+
+	res, err := c.conn.Do(httpReq)
+	if err != nil {
+		return library.ReservedBook{}, fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return library.ReservedBook{}, fmt.Errorf("invalid status code: %d", res.StatusCode)
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return library.ReservedBook{}, fmt.Errorf("failed to read http response")
+	}
+
+	var resp v1.TakeBookResponse
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return library.ReservedBook{}, fmt.Errorf("failed to parse http response")
+	}
+
+	return library.ReservedBook{
+		Book:    library.Book(resp.Book),
+		Library: library.Library(resp.Library),
+	}, nil
 }

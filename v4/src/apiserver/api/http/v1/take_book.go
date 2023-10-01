@@ -15,17 +15,6 @@ type TakeBookRequest struct {
 	End           Time   `json:"tillDate" valid:"required"`
 }
 
-func (r TakeBookRequest) MarshalJSON() ([]byte, error) {
-	type Alias TakeBookRequest
-	return json.Marshal(&struct {
-		Alias
-		End string `json:"tillDate"`
-	}{
-		Alias: (Alias)(r),
-		End:   r.End.Format(time.DateOnly),
-	})
-}
-
 type TakeBookResponse struct {
 	ID      string    `json:"reservationUid"`
 	Status  string    `json:"status"`
