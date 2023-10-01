@@ -13,7 +13,6 @@ import (
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/rating"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
 	v1 "github.com/migregal/bmstu-iu7-ds-lab2/rating/api/http/v1"
-	"github.com/migregal/bmstu-iu7-ds-lab2/rating/core/ports/ratings"
 )
 
 var probeKey = "http-rating-client"
@@ -73,38 +72,38 @@ func (c *Client) ping(probe *readiness.Probe) {
 
 func (c *Client) GetUserRating(
 	ctx context.Context, username string,
-) (ratings.Rating, error) {
+) (rating.Rating, error) {
 	url := fmt.Sprintf("http://%s/api/v1/rating", c.addr)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return ratings.Rating{}, fmt.Errorf("failed to init http request: %w", err)
+		return rating.Rating{}, fmt.Errorf("failed to init http request: %w", err)
 	}
 
 	req.Header.Add("X-User-Name", username)
 
 	res, err := c.conn.Do(req)
 	if err != nil {
-		return ratings.Rating{}, fmt.Errorf("failed to execute http request: %w", err)
+		return rating.Rating{}, fmt.Errorf("failed to execute http request: %w", err)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return ratings.Rating{}, fmt.Errorf("invalid status code: %d", res.StatusCode)
+		return rating.Rating{}, fmt.Errorf("invalid status code: %d", res.StatusCode)
 	}
 
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return ratings.Rating{}, fmt.Errorf("failed to read http response")
+		return rating.Rating{}, fmt.Errorf("failed to read http response")
 	}
 
 	var resp v1.RatingResponse
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return ratings.Rating{}, fmt.Errorf("failed to parse http ersponse")
+		return rating.Rating{}, fmt.Errorf("failed to parse http ersponse")
 	}
 
-	rating := ratings.Rating{
+	rating := rating.Rating{
 		Stars: uint32(resp.Stars),
 	}
 
