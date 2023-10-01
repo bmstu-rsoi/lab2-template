@@ -8,6 +8,7 @@ import (
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/config"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/services/library"
+	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/services/rating"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/services/reservation"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/apiutils"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
@@ -29,12 +30,17 @@ func New(lg *slog.Logger, cfg *config.Config) (*App, error) {
 		return nil, fmt.Errorf("failed to init library connection: %w", err)
 	}
 
-	reservationapi, err := reservation.New(lg, cfg.Reservation, probe)
+	ratingapi, err := rating.New(lg, cfg.Rating, probe)
 	if err != nil {
-		return nil, fmt.Errorf("failed to init library connection: %w", err)
+		return nil, fmt.Errorf("failed to init ratings connection: %w", err)
 	}
 
-	core, err := core.New(lg, probe, libraryapi, nil, reservationapi)
+	reservationapi, err := reservation.New(lg, cfg.Reservation, probe)
+	if err != nil {
+		return nil, fmt.Errorf("failed to init reservations connection: %w", err)
+	}
+
+	core, err := core.New(lg, probe, libraryapi, ratingapi, reservationapi)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init core: %w", err)
 	}

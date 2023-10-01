@@ -81,6 +81,12 @@ func (c *Client) GetUserReservations(
 
 	req.Header.Add("X-User-Name", username)
 
+	q := req.URL.Query()
+	if status != "" {
+		q.Add("status", status)
+	}
+	req.URL.RawQuery = q.Encode()
+
 	res, err := c.conn.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute http request: %w", err)
@@ -94,7 +100,7 @@ func (c *Client) GetUserReservations(
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read http ersponse")
+		return nil, fmt.Errorf("failed to read http response")
 	}
 
 	var resp []v1.Reservation

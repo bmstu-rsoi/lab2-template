@@ -103,7 +103,7 @@ func (c *Client) GetLibraries(
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return library.Libraries{}, fmt.Errorf("failed to read http ersponse")
+		return library.Libraries{}, fmt.Errorf("failed to read http response")
 	}
 
 	var resp v1.LibrariesResponse
@@ -153,7 +153,7 @@ func (c *Client) GetBooks(
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return library.LibraryBooks{}, fmt.Errorf("failed to read http ersponse")
+		return library.LibraryBooks{}, fmt.Errorf("failed to read http response")
 	}
 
 	var resp v1.BooksResponse
