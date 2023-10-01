@@ -1,6 +1,7 @@
 package reservation
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -106,7 +107,7 @@ func (c *Client) GetUserReservations(
 	var resp []v1.Reservation
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse http ersponse")
+		return nil, fmt.Errorf("failed to parse http response")
 	}
 
 	reservs := []reservation.Reservation{}
@@ -125,6 +126,52 @@ func (c *Client) GetUserReservations(
 	return reservs, nil
 }
 
-func (c *Client) AddUserReservation(ctx context.Context, res reservation.Reservation) (string, error) {
-	return "", nil
+func (c *Client) AddUserReservation(ctx context.Context, rsrvtn reservation.Reservation) (string, error) {
+	var reqReader io.Reader
+	{
+		body, err := json.Marshal(v1.AddReservationRequest{
+			Status:    rsrvtn.Status,
+			Start:     rsrvtn.Start,
+			End:       rsrvtn.End,
+			BookID:    rsrvtn.BookID,
+			LibraryID: rsrvtn.LibraryID,
+		})
+		if err != nil {
+			return "", fmt.Errorf("failed to format json body: %w", err)
+		}
+
+		reqReader = bytes.NewBuffer(body)
+	}
+
+	url := fmt.Sprintf("http://%s/api/v1/reservations", c.addr)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, reqReader)
+	if err != nil {
+		return "", fmt.Errorf("failed to init http request: %w", err)
+	}
+
+	httpReq.Header.Add("X-User-Name", rsrvtn.Username)
+
+	res, err := c.conn.Do(httpReq)
+	if err != nil {
+		return "", fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("invalid status code: %d", res.StatusCode)
+	}
+
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read http response")
+	}
+
+	var resp v1.AddReservationResponse
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse http response")
+	}
+
+	return resp.ID, nil
 }
