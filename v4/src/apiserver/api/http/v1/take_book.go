@@ -50,14 +50,22 @@ func (r TakeBookResponse) MarshalJSON() ([]byte, error) {
 }
 
 func (a *api) TakeBook(c echo.Context, req TakeBookRequest) error {
-	err := a.core.TakeBook(
+	data, err := a.core.TakeBook(
 		c.Request().Context(), req.Username, req.LibraryID, req.BookID, req.End.Time,
 	)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	resp := TakeBookResponse{}
+	resp := TakeBookResponse{
+		ID:      data.ID,
+		Status:  data.Status,
+		Start:   data.Start,
+		End:     data.End,
+		Book:    Book(data.ReservedBook.Book),
+		Library: Library(data.ReservedBook.Library),
+		Rating:  Rating(data.Rating),
+	}
 
 	return c.JSON(http.StatusOK, &resp)
 }

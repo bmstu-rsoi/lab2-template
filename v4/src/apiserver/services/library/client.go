@@ -170,6 +170,6 @@ func (c *Client) GetBooks(
 	return books, nil
 }
 
-func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string) error {
-	return nil
+func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string) (library.ReservedBook, error) {
+	return library.ReservedBook{}, nil
 }

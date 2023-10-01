@@ -66,27 +66,22 @@ func (c *Core) GetUserReservations(
 
 func (c *Core) TakeBook(
 	ctx context.Context, username, libraryID, bookID string, end time.Time,
-) (reservation.Reservation, error) {
+) (reservation.ReservationFullInfo, error) {
 	resvs, err := c.reservation.GetUserReservations(ctx, username, "RENTED")
 	if err != nil {
-		return reservation.Reservation{}, fmt.Errorf("failed to get user reservations: %w", err)
+		return reservation.ReservationFullInfo{}, fmt.Errorf("failed to get user reservations: %w", err)
 	}
 
 	rating, err := c.rating.GetUserRating(ctx, username)
 	if err != nil {
-		return reservation.Reservation{}, fmt.Errorf("failed to get user rating: %w", err)
+		return reservation.ReservationFullInfo{}, fmt.Errorf("failed to get user rating: %w", err)
 	}
 
-	if uint32(len(resvs)) >= rating.Stars {
-		return reservation.Reservation{}, fmt.Errorf("insufficient rating")
+	if uint64(len(resvs)) >= rating.Stars {
+		return reservation.ReservationFullInfo{}, fmt.Errorf("insufficient rating")
 	}
 
-	err = c.library.ObtainBook(ctx, libraryID, bookID)
-	if err != nil {
-		return reservation.Reservation{}, fmt.Errorf("failed to obtain book from library: %w", err)
-	}
-
-	res := reservation.Reservation{
+	rsvtn := reservation.Reservation{
 		Username:  username,
 		Status:    "RENTED",
 		Start:     time.Now(),
@@ -95,9 +90,23 @@ func (c *Core) TakeBook(
 		BookID:    bookID,
 	}
 
-	res.ID, err = c.reservation.AddUserReservation(ctx, res)
+	rsvtn.ID, err = c.reservation.AddUserReservation(ctx, rsvtn)
 	if err != nil {
-		return reservation.Reservation{}, fmt.Errorf("failed add reservation for obtained book: %w", err)
+		return reservation.ReservationFullInfo{}, fmt.Errorf("failed add reservation for obtained book: %w", err)
+	}
+
+	book, err := c.library.ObtainBook(ctx, libraryID, bookID)
+	if err != nil {
+		return reservation.ReservationFullInfo{}, fmt.Errorf("failed to obtain book from library: %w", err)
+	}
+
+	res := reservation.ReservationFullInfo{
+		Username:     rsvtn.Username,
+		Status:       rsvtn.Status,
+		Start:        rsvtn.Start,
+		End:          rsvtn.End,
+		ReservedBook: book,
+		Rating:       rating,
 	}
 
 	return res, nil

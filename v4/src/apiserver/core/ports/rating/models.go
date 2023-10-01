@@ -1,5 +1,5 @@
 package rating
 
 type Rating struct {
-	Stars uint32
+	Stars uint64
 }

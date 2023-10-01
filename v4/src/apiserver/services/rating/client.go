@@ -103,9 +103,7 @@ func (c *Client) GetUserRating(
 		return rating.Rating{}, fmt.Errorf("failed to parse http ersponse")
 	}
 
-	rating := rating.Rating{
-		Stars: uint32(resp.Stars),
-	}
+	rating := rating.Rating(resp)
 
 	return rating, nil
 }

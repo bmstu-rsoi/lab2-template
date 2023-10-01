@@ -15,7 +15,7 @@ type Core interface {
 	GetLibraries(context.Context, string, uint64, uint64) (library.Libraries, error)
 	GetLibraryBooks(context.Context, string, bool, uint64, uint64) (library.LibraryBooks, error)
 	GetUserReservations(context.Context, string) ([]reservation.Reservation, error)
-	TakeBook(ctx context.Context, usename, libraryID, bookID string, end time.Time) error
+	TakeBook(ctx context.Context, usename, libraryID, bookID string, end time.Time) (reservation.ReservationFullInfo, error)
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
