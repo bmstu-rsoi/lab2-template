@@ -23,6 +23,29 @@ services:
       timeout: 5s
       retries: 5
 
+  rating:
+    image: migregal/library-ratingapi:${TAG}
+    build:
+      context: .
+      dockerfile: v4/src/docker/rating/Dockerfile
+    container_name: rating
+    ports:
+      - "8050:8050"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./v4/src/rating/config-gh.yaml:/usr/local/etc/rating/config.yaml
+    networks:
+      - rating
+      - database
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://rating:8050/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+
   library:
     image: migregal/library-libraryapi:${TAG}
     build:
@@ -86,6 +109,7 @@ services:
       - ./v4/src/apiserver/config-gh.yaml:/usr/local/etc/apiserver/config.yaml
     networks:
       - api-gateaway
+      - rating
       - library
       - reservation
     healthcheck:
@@ -101,6 +125,10 @@ volumes:
 networks:
   api-gateaway:
     driver: bridge
+
+  rating:
+    driver: bridge
+    internal: true
 
   library:
     driver: bridge

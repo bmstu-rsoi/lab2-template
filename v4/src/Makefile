@@ -7,6 +7,10 @@ generate:
 build_apiserver:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/apiserver ./cmd/apiserver/main.go
 
+.PHONY: build_rating
+build_rating:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/rating ./cmd/rating/main.go
+
 .PHONY: build_library
 build_library:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/library ./cmd/library/main.go
