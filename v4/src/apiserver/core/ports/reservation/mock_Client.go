@@ -21,6 +21,59 @@ func (_m *MockClient) EXPECT() *MockClient_Expecter {
 	return &MockClient_Expecter{mock: &_m.Mock}
 }
 
+// AddUserReservation provides a mock function with given fields: ctx, res
+func (_m *MockClient) AddUserReservation(ctx context.Context, res Reservation) (string, error) {
+	ret := _m.Called(ctx, res)
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, Reservation) (string, error)); ok {
+		return rf(ctx, res)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, Reservation) string); ok {
+		r0 = rf(ctx, res)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, Reservation) error); ok {
+		r1 = rf(ctx, res)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockClient_AddUserReservation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddUserReservation'
+type MockClient_AddUserReservation_Call struct {
+	*mock.Call
+}
+
+// AddUserReservation is a helper method to define mock.On call
+//   - ctx context.Context
+//   - res Reservation
+func (_e *MockClient_Expecter) AddUserReservation(ctx interface{}, res interface{}) *MockClient_AddUserReservation_Call {
+	return &MockClient_AddUserReservation_Call{Call: _e.mock.On("AddUserReservation", ctx, res)}
+}
+
+func (_c *MockClient_AddUserReservation_Call) Run(run func(ctx context.Context, res Reservation)) *MockClient_AddUserReservation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(Reservation))
+	})
+	return _c
+}
+
+func (_c *MockClient_AddUserReservation_Call) Return(_a0 string, _a1 error) *MockClient_AddUserReservation_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockClient_AddUserReservation_Call) RunAndReturn(run func(context.Context, Reservation) (string, error)) *MockClient_AddUserReservation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetUserReservations provides a mock function with given fields: ctx, username, status
 func (_m *MockClient) GetUserReservations(ctx context.Context, username string, status string) ([]Reservation, error) {
 	ret := _m.Called(ctx, username, status)

@@ -1,0 +1,8 @@
+http_addr: ":8050"
+
+ratings:
+  host: postgres
+  port: 5432
+  user: program
+  password: test
+  database: ratings
