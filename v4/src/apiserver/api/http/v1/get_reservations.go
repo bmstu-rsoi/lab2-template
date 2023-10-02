@@ -14,7 +14,7 @@ type ReservationsRequest struct {
 
 type ReservationsResponse struct {
 	ID      string    `json:"reservationUid" valid:"uuidv4,required"`
-	Status  string    `json:"status," valid:"in(RENTED,RETURNED,EXPIRED)"`
+	Status  string    `json:"status" valid:"in(RENTED|RETURNED|EXPIRED)"`
 	Start   time.Time `json:"-"`
 	End     time.Time `json:"-"`
 	Book    Book      `json:"book"`

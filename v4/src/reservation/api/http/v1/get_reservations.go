@@ -11,12 +11,12 @@ import (
 type ReservationsRequest struct {
 	AuthedRequest `valid:"optional"`
 
-	Status string `query:"status" valid:"in(RENTED,RETURNED,EXPIRED),optional"`
+	Status string `query:"status" valid:"in(RENTED|RETURNED|EXPIRED),optional"`
 }
 
 type Reservation struct {
 	ID        string    `json:"reservationUid" valid:"uuidv4,required"`
-	Status    string    `json:"status" valid:"in(RENTED,RETURNED,EXPIRED)"`
+	Status    string    `json:"status" valid:"in(RENTED|RETURNED|EXPIRED)"`
 	Start     time.Time `json:"-"`
 	End       time.Time `json:"-"`
 	BookID    string    `json:"book_id"`

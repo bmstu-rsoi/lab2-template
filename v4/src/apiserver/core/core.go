@@ -69,15 +69,18 @@ func (c *Core) TakeBook(
 ) (reservation.ReservationFullInfo, error) {
 	resvs, err := c.reservation.GetUserReservations(ctx, username, "RENTED")
 	if err != nil {
+		c.lg.Warn("failed to get reservations", "error", err)
 		return reservation.ReservationFullInfo{}, fmt.Errorf("failed to get user reservations: %w", err)
 	}
 
 	rating, err := c.rating.GetUserRating(ctx, username)
 	if err != nil {
+		c.lg.Warn("failed to get rating", "error", err)
 		return reservation.ReservationFullInfo{}, fmt.Errorf("failed to get user rating: %w", err)
 	}
 
 	if uint64(len(resvs)) >= rating.Stars {
+		c.lg.Warn("insufficient rating", "rating", rating.Stars)
 		return reservation.ReservationFullInfo{}, fmt.Errorf("insufficient rating")
 	}
 
@@ -92,11 +95,13 @@ func (c *Core) TakeBook(
 
 	rsvtn.ID, err = c.reservation.AddUserReservation(ctx, rsvtn)
 	if err != nil {
-		return reservation.ReservationFullInfo{}, fmt.Errorf("failed add reservation for obtained book: %w", err)
+		c.lg.Warn("failed to add reservation", "error", err)
+		return reservation.ReservationFullInfo{}, fmt.Errorf("failed to add reservation for obtained book: %w", err)
 	}
 
 	book, err := c.library.ObtainBook(ctx, libraryID, bookID)
 	if err != nil {
+		c.lg.Warn("failed to update books amount", "error", err)
 		return reservation.ReservationFullInfo{}, fmt.Errorf("failed to obtain book from library: %w", err)
 	}
 

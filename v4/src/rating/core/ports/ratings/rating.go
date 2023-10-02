@@ -2,7 +2,12 @@ package ratings
 
 import (
 	"context"
+	"errors"
 	"time"
+)
+
+var (
+	ErrNotFound = errors.New("not found")
 )
 
 type Config struct {

@@ -9,7 +9,7 @@ import (
 
 type AddReservationRequest struct {
 	AuthedRequest `valid:"optional"`
-	Status        string    `json:"status," valid:"in(RENTED,RETURNED,EXPIRED)"`
+	Status        string    `json:"status," valid:"in(RENTED|RETURNED|EXPIRED)"`
 	Start         time.Time `json:"startDate" valid:"required"`
 	End           time.Time `json:"tillDate" valid:"required"`
 	BookID        string    `json:"book_id" valid:"uuidv4,required"`

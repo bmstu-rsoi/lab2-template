@@ -21,7 +21,7 @@ type Server struct {
 	mx *echo.Echo
 }
 
-func New(_ *slog.Logger, probe *readiness.Probe, core Core) (*Server, error) {
+func New(lg *slog.Logger, probe *readiness.Probe, core Core) (*Server, error) {
 	mx := echo.New()
 	mx.Use(
 		middleware.Recover(),
@@ -46,7 +46,7 @@ func New(_ *slog.Logger, probe *readiness.Probe, core Core) (*Server, error) {
 		return nil, fmt.Errorf("failed to init common apis: %w", err)
 	}
 
-	err = v1.InitListener(s.mx, core)
+	err = v1.InitListener(s.mx, lg.With("api", "v1"), core)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init v1 apis: %w", err)
 	}

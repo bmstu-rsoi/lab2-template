@@ -3,6 +3,7 @@ package ratingdb
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -44,6 +45,10 @@ func (d *DB) GetUserRating(
 	stmt := tx.Where("username = ?", username)
 	if err := stmt.First(&data).Error; err != nil {
 		tx.Rollback()
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			err = ratings.ErrNotFound
+		}
 
 		return ratings.Rating{}, fmt.Errorf("failed to find rating info: %w", err)
 	}

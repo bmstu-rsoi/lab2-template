@@ -45,7 +45,7 @@ func runMigrations(lg *slog.Logger, db *gorm.DB, probe *readiness.Probe, interva
 
 	sync.OnceFunc(func() {
 		probe.Mark(probeKey, true)
-		lg.Warn("[startup] reservations db ready")
+		lg.Warn("[startup] ratings db ready")
 	})()
 }
 

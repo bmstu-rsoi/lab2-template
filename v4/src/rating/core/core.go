@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -13,11 +14,11 @@ type Core struct {
 	rating ratings.Client
 }
 
-func New(lg *slog.Logger, probe *readiness.Probe, reservation ratings.Client) (*Core, error) {
+func New(lg *slog.Logger, probe *readiness.Probe, rating ratings.Client) (*Core, error) {
 	probe.Mark("core", true)
 	lg.Warn("[startup] core ready")
 
-	return &Core{rating: reservation}, nil
+	return &Core{rating: rating}, nil
 }
 
 func (c *Core) GetUserRating(
@@ -25,7 +26,11 @@ func (c *Core) GetUserRating(
 ) (ratings.Rating, error) {
 	data, err := c.rating.GetUserRating(ctx, username)
 	if err != nil {
-		return ratings.Rating{}, fmt.Errorf("failed to get list of user reservations: %w", err)
+		if errors.Is(err, ratings.ErrNotFound) {
+			return ratings.Rating{}, nil
+		}
+
+		return ratings.Rating{}, fmt.Errorf("failed to get user rating: %w", err)
 	}
 
 	return data, nil
