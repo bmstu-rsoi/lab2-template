@@ -25,27 +25,27 @@ func New(lg *slog.Logger, cfg *config.Config) (*App, error) {
 
 	probe := readiness.New()
 
-	libraryapi, err := library.New(lg, cfg.Library, probe)
+	libraryapi, err := library.New(lg.With("module", "library"), cfg.Library, probe)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init library connection: %w", err)
 	}
 
-	ratingapi, err := rating.New(lg, cfg.Rating, probe)
+	ratingapi, err := rating.New(lg.With("module", "rating"), cfg.Rating, probe)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init ratings connection: %w", err)
 	}
 
-	reservationapi, err := reservation.New(lg, cfg.Reservation, probe)
+	reservationapi, err := reservation.New(lg.With("module", "reservation"), cfg.Reservation, probe)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init reservations connection: %w", err)
 	}
 
-	core, err := core.New(lg, probe, libraryapi, ratingapi, reservationapi)
+	core, err := core.New(lg.With("module", "core"), probe, libraryapi, ratingapi, reservationapi)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init core: %w", err)
 	}
 
-	a.http, err = http.New(lg, probe, core)
+	a.http, err = http.New(lg.With("module", "http_api"), probe, core)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init http server: %w", err)
 	}

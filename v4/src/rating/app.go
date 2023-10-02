@@ -23,17 +23,17 @@ func New(lg *slog.Logger, cfg *config.Config) (*App, error) {
 
 	probe := readiness.New()
 
-	ratings, err := ratingdb.New(lg, cfg.Ratings, probe)
+	ratings, err := ratingdb.New(lg.With("module", "rating"), cfg.Ratings, probe)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init ratings db: %w", err)
 	}
 
-	core, err := core.New(lg, probe, ratings)
+	core, err := core.New(lg.With("module", "core"), probe, ratings)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init core: %w", err)
 	}
 
-	a.http, err = http.New(lg, probe, core)
+	a.http, err = http.New(lg.With("module", "http_api"), probe, core)
 	if err != nil {
 		return nil, fmt.Errorf("failed to init http server: %w", err)
 	}
