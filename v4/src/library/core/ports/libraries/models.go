@@ -21,3 +21,8 @@ type Book struct {
 }
 
 type LibraryBooks collections.Countable[Book]
+
+type ReservedBook struct {
+	Book    Book
+	Library Library
+}

@@ -17,12 +17,15 @@ type TakeBookResponse struct {
 }
 
 func (a *api) TakeBook(c echo.Context, req TakeBookRequest) error {
-	err := a.core.TakeBook(c.Request().Context(), req.LibraryID, req.BookID)
+	data, err := a.core.TakeBook(c.Request().Context(), req.LibraryID, req.BookID)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	resp := TakeBookResponse{}
+	resp := TakeBookResponse{
+		Book:    Book(data.Book),
+		Library: Library(data.Library),
+	}
 
 	return c.JSON(http.StatusOK, resp)
 }

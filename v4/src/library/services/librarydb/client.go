@@ -3,11 +3,13 @@ package librarydb
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/migregal/bmstu-iu7-ds-lab2/library/core/ports/libraries"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
@@ -67,7 +69,7 @@ func (d *DB) GetLibraries(
 	resp.Total = uint64(count)
 	for _, lib := range libs {
 		resp.Items = append(resp.Items, libraries.Library{
-			ID:      lib.LibraryID.String(),
+			ID:      lib.ID.String(),
 			Name:    lib.Name,
 			Address: lib.Address,
 			City:    lib.City,
@@ -84,14 +86,7 @@ func (d *DB) GetLibraryBooks(
 ) (resp libraries.LibraryBooks, err error) {
 	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
 
-	var lib Library
-	if err := tx.Where("library_uid = ?", libraryID).First(&lib).Error; err != nil {
-		tx.Rollback()
-
-		return resp, fmt.Errorf("failed to find library info: %w", err)
-	}
-
-	stmt := tx.Model(&LibraryBook{}).Where("fk_library_id = ?", lib.ID)
+	stmt := tx.Model(&LibraryBook{}).Where("fk_library_id = ?", libraryID)
 	if !showAll {
 		stmt = stmt.Where("available_count > 0")
 	}
@@ -103,7 +98,7 @@ func (d *DB) GetLibraryBooks(
 		return resp, fmt.Errorf("failed to count library books info: %w", err)
 	}
 
-	stmt = tx.Offset(int((page-1)*size)).Limit(int(size)).Where("fk_library_id = ?", lib.ID)
+	stmt = tx.Offset(int((page-1)*size)).Limit(int(size)).Where("fk_library_id = ?", libraryID)
 	if !showAll {
 		stmt = stmt.Where("available_count > 0")
 	}
@@ -118,7 +113,7 @@ func (d *DB) GetLibraryBooks(
 	resp.Total = uint64(count)
 	for _, book := range libraryBooks {
 		resp.Items = append(resp.Items, libraries.Book{
-			ID:        book.BookRef.BookID.String(),
+			ID:        book.BookRef.ID.String(),
 			Name:      book.BookRef.Name,
 			Author:    book.BookRef.Author,
 			Genre:     book.BookRef.Genre,
@@ -129,5 +124,46 @@ func (d *DB) GetLibraryBooks(
 
 	tx.Commit()
 
+	return resp, nil
+}
+
+func (d *DB) TakeBookFromLibrary(
+	ctx context.Context, libraryID, bookID string,
+) (resp libraries.ReservedBook, err error) {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead})
+
+	var libraryBook LibraryBook
+	stmt := tx.Model(&libraryBook).Clauses(clause.Returning{})
+	stmt = stmt.Where("fk_library_id = ?", libraryID).Where("fk_book_id = ?", bookID)
+	stmt = stmt.Preload("BookRef").Preload("LibraryRef")
+
+	if err := stmt.Update("available_count", gorm.Expr("available_count - 1")).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+
+		}
+
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to update book info: %w", err)
+	}
+
+	tx.Commit()
+
+	resp = libraries.ReservedBook{
+		Book: libraries.Book{
+			ID:        libraryBook.BookRef.ID.String(),
+			Name:      libraryBook.BookRef.Name,
+			Author:    libraryBook.BookRef.Author,
+			Genre:     libraryBook.BookRef.Genre,
+			Condition: libraryBook.BookRef.Condition,
+			Available: libraryBook.AvailableCount,
+		},
+		Library: libraries.Library{
+			ID:      libraryBook.LibraryRef.ID.String(),
+			Name:    libraryBook.LibraryRef.Name,
+			Address: libraryBook.LibraryRef.Address,
+			City:    libraryBook.LibraryRef.City,
+		},
+	}
 	return resp, nil
 }

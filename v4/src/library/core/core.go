@@ -42,6 +42,11 @@ func (c *Core) GetLibraryBooks(
 	return books, nil
 }
 
-func (c *Core) TakeBook(context.Context, string, string) error {
-	return nil
+func (c *Core) TakeBook(ctx context.Context, libraryID, bookID string) (libraries.ReservedBook, error) {
+	data, err := c.libraries.TakeBookFromLibrary(ctx, libraryID, bookID)
+	if err != nil {
+		return libraries.ReservedBook{}, fmt.Errorf("failed to take book from db: %w", err)
+	}
+
+	return data, nil
 }

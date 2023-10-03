@@ -12,7 +12,7 @@ import (
 type Core interface {
 	GetLibraryBooks(context.Context, string, bool, uint64, uint64) (libraries.LibraryBooks, error)
 	GetLibraries(context.Context, string, uint64, uint64) (libraries.Libraries, error)
-	TakeBook(context.Context, string, string) error
+	TakeBook(context.Context, string, string) (libraries.ReservedBook, error)
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
