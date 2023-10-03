@@ -150,6 +150,7 @@ func (c *Client) AddUserReservation(ctx context.Context, rsrvtn reservation.Rese
 	}
 
 	httpReq.Header.Add("X-User-Name", rsrvtn.Username)
+	httpReq.Header.Add("Content-Type", "application/json")
 
 	res, err := c.conn.Do(httpReq)
 	if err != nil {

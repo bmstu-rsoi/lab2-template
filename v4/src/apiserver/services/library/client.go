@@ -191,6 +191,8 @@ func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string
 		return library.ReservedBook{}, fmt.Errorf("failed to init http request: %w", err)
 	}
 
+	httpReq.Header.Add("Content-Type", "application/json")
+
 	res, err := c.conn.Do(httpReq)
 	if err != nil {
 		return library.ReservedBook{}, fmt.Errorf("failed to execute http request: %w", err)

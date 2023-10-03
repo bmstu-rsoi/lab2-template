@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -13,32 +14,36 @@ type Core interface {
 	GetUserRating(context.Context, string) (ratings.Rating, error)
 }
 
-func InitListener(mx *echo.Echo, core Core) error {
+func InitListener(mx *echo.Echo, lg *slog.Logger, core Core) error {
 	gr := mx.Group("/api/v1")
 
-	a := api{core: core}
+	a := api{lg: lg, core: core}
 
-	gr.GET("/rating", WrapRequest(a.GetRating))
+	gr.GET("/rating", WrapRequest(lg, a.GetRating))
 
 	return nil
 }
 
 type api struct {
+	lg   *slog.Logger
 	core Core
 }
 
-func WrapRequest[T any](handler func(echo.Context, T) error) func(echo.Context) error {
+func WrapRequest[T any](lg *slog.Logger, handler func(echo.Context, T) error) func(echo.Context) error {
 	return func(c echo.Context) error {
 		binder := &echo.DefaultBinder{}
 
 		var req T
 		if err := binder.Bind(&req, c); err != nil {
+			lg.Warn("failed to bind request", "error", err)
 			return c.String(http.StatusBadRequest, "bad request")
 		}
 		if err := binder.BindHeaders(c, &req); err != nil {
+			lg.Warn("failed to bind headers", "error", err)
 			return c.String(http.StatusBadRequest, "bad request")
 		}
 		if err := c.Validate(req); err != nil {
+			lg.Warn("failed to validate request", "error", err)
 			resp := ValidationErrorResponse{
 				http.StatusText(http.StatusBadRequest),
 				httpvalidator.ParseErrors(err),

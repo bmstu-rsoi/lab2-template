@@ -27,7 +27,7 @@ func (c *Core) GetUserRating(
 	data, err := c.rating.GetUserRating(ctx, username)
 	if err != nil {
 		if errors.Is(err, ratings.ErrNotFound) {
-			return ratings.Rating{}, nil
+			return ratings.Rating{Stars: 1}, nil
 		}
 
 		return ratings.Rating{}, fmt.Errorf("failed to get user rating: %w", err)
