@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/rating"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
+	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness/httpprober"
 	v1 "github.com/migregal/bmstu-iu7-ds-lab2/rating/api/http/v1"
 )
 
@@ -36,33 +36,9 @@ func New(lg *slog.Logger, cfg rating.Config, probe *readiness.Probe) (*Client, e
 		conn: client,
 	}
 
-	go c.ping(probe)
+	go httpprober.New(lg, client).Ping(probeKey, probe)
 
 	return &c, nil
-}
-
-func (c *Client) ping(probe *readiness.Probe) {
-	sync.OnceFunc(func() {
-		probe.Mark(probeKey, false)
-	})
-
-	func() {
-		for {
-			resp, err := c.conn.R().Get("/readiness")
-			if err != nil {
-				continue
-			}
-
-			if resp.StatusCode() != http.StatusOK {
-				continue
-			}
-
-			sync.OnceFunc(func() {
-				probe.Mark(probeKey, true)
-				c.lg.Warn("[startup] rating client ready")
-			})
-		}
-	}()
 }
 
 func (c *Client) GetUserRating(

@@ -8,7 +8,6 @@ import (
 	"math"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -16,6 +15,7 @@ import (
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/library"
 	v1 "github.com/migregal/bmstu-iu7-ds-lab2/library/api/http/v1"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
+	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness/httpprober"
 )
 
 var probeKey = "http-library-client"
@@ -40,33 +40,9 @@ func New(lg *slog.Logger, cfg library.Config, probe *readiness.Probe) (*Client, 
 		conn: client,
 	}
 
-	go c.ping(probe)
+	go httpprober.New(lg, client).Ping(probeKey, probe)
 
 	return &c, nil
-}
-
-func (c *Client) ping(probe *readiness.Probe) {
-	sync.OnceFunc(func() {
-		probe.Mark(probeKey, false)
-	})
-
-	func() {
-		for {
-			resp, err := c.conn.R().Get("/readiness")
-			if err != nil {
-				continue
-			}
-
-			if resp.StatusCode() != http.StatusOK {
-				continue
-			}
-
-			sync.OnceFunc(func() {
-				probe.Mark(probeKey, true)
-				c.lg.Warn("[startup] library client ready")
-			})
-		}
-	}()
 }
 
 func (c *Client) GetLibraries(
