@@ -4,6 +4,7 @@ go 1.21.1
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+	github.com/go-resty/resty/v2 v2.9.1
 	github.com/google/uuid v1.1.2
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/spf13/viper v1.16.0
@@ -37,10 +38,10 @@ require (
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/crypto v0.11.0 // indirect
-	golang.org/x/net v0.12.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
+	golang.org/x/crypto v0.13.0 // indirect
+	golang.org/x/net v0.15.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

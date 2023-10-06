@@ -1,17 +1,17 @@
 package library
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
 	"math"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/library"
 	v1 "github.com/migregal/bmstu-iu7-ds-lab2/library/api/http/v1"
@@ -23,25 +23,21 @@ var probeKey = "http-library-client"
 type Client struct {
 	lg *slog.Logger
 
-	conn *http.Client
-
-	addr string
+	conn *resty.Client
 }
 
 func New(lg *slog.Logger, cfg library.Config, probe *readiness.Probe) (*Client, error) {
-	tr := &http.Transport{
-		MaxIdleConns:       10,
-		IdleConnTimeout:    30 * time.Second,
-		DisableCompression: true,
-	}
-	conn := http.Client{
-		Transport: tr,
-	}
+	client := resty.New().
+		SetTransport(&http.Transport{
+			MaxIdleConns:       10,
+			IdleConnTimeout:    30 * time.Second,
+			DisableCompression: true,
+		}).
+		SetBaseURL(fmt.Sprintf("http://%s:%d", cfg.Host, cfg.Port))
 
 	c := Client{
 		lg:   lg,
-		conn: &conn,
-		addr: fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		conn: client,
 	}
 
 	go c.ping(probe)
@@ -56,12 +52,12 @@ func (c *Client) ping(probe *readiness.Probe) {
 
 	func() {
 		for {
-			resp, err := c.conn.Get(c.addr + "/readiness")
+			resp, err := c.conn.R().Get("/readiness")
 			if err != nil {
 				continue
 			}
 
-			if resp.StatusCode != http.StatusOK {
+			if resp.StatusCode() != http.StatusOK {
 				continue
 			}
 
@@ -76,45 +72,31 @@ func (c *Client) ping(probe *readiness.Probe) {
 func (c *Client) GetLibraries(
 	ctx context.Context, city string, page uint64, size uint64,
 ) (library.Libraries, error) {
-	url := fmt.Sprintf("http://%s/api/v1/libraries", c.addr)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return library.Libraries{}, fmt.Errorf("failed to init http request: %w", err)
+	q := map[string]string{
+		"city": city,
+		"page": strconv.FormatUint(page, 10),
 	}
-
-	q := req.URL.Query()
-	q.Add("city", city)
-	q.Add("page", strconv.FormatUint(page, 10))
 	if size == 0 {
 		size = math.MaxUint64
 	}
-	q.Add("size", strconv.FormatUint(size, 10))
-	req.URL.RawQuery = q.Encode()
+	q["size"] = strconv.FormatUint(size, 10)
 
-	res, err := c.conn.Do(req)
+	resp, err := c.conn.R().
+		SetQueryParams(q).
+		SetResult(&v1.LibrariesResponse{}).
+		Get("/api/v1/libraries")
 	if err != nil {
 		return library.Libraries{}, fmt.Errorf("failed to execute http request: %w", err)
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return library.Libraries{}, fmt.Errorf("invalid status code: %d", res.StatusCode)
+	if resp.StatusCode() != http.StatusOK {
+		return library.Libraries{}, fmt.Errorf("invalid status code: %d", resp.StatusCode())
 	}
 
-	defer res.Body.Close()
+	data := resp.Result().(*v1.LibrariesResponse)
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return library.Libraries{}, fmt.Errorf("failed to read http response")
-	}
-
-	var resp v1.LibrariesResponse
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return library.Libraries{}, fmt.Errorf("failed to parse http ersponse")
-	}
-
-	books := library.Libraries{Total: resp.Total}
-	for _, book := range resp.Items {
+	books := library.Libraries{Total: data.Total}
+	for _, book := range data.Items {
 		books.Items = append(books.Items, library.Library(book))
 	}
 
@@ -124,47 +106,33 @@ func (c *Client) GetLibraries(
 func (c *Client) GetBooks(
 	ctx context.Context, libraryID string, showAll bool, page uint64, size uint64,
 ) (library.LibraryBooks, error) {
-	url := fmt.Sprintf("http://%s/api/v1/libraries/%s/books", c.addr, libraryID)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return library.LibraryBooks{}, fmt.Errorf("failed to init http request: %w", err)
-	}
-
-	q := req.URL.Query()
+	q := map[string]string{}
 	if showAll {
-		q.Add("show_all", "1")
+		q["show_all"] = "1"
 	}
-	q.Add("page", strconv.FormatUint(page, 10))
+	q["page"] = strconv.FormatUint(page, 10)
 	if size == 0 {
 		size = math.MaxUint64
 	}
-	q.Add("size", strconv.FormatUint(size, 10))
-	req.URL.RawQuery = q.Encode()
+	q["size"] = strconv.FormatUint(size, 10)
 
-	res, err := c.conn.Do(req)
+	resp, err := c.conn.R().
+		SetQueryParams(q).
+		SetPathParam("library_id", libraryID).
+		SetResult(&v1.BooksResponse{}).
+		Get("/api/v1/libraries/{library_id}/books")
 	if err != nil {
 		return library.LibraryBooks{}, fmt.Errorf("failed to execute http request: %w", err)
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return library.LibraryBooks{}, fmt.Errorf("invalid status code: %d", res.StatusCode)
+	if resp.StatusCode() != http.StatusOK {
+		return library.LibraryBooks{}, fmt.Errorf("invalid status code: %d", resp.StatusCode())
 	}
 
-	defer res.Body.Close()
+	data := resp.Result().(*v1.BooksResponse)
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return library.LibraryBooks{}, fmt.Errorf("failed to read http response")
-	}
-
-	var resp v1.BooksResponse
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return library.LibraryBooks{}, fmt.Errorf("failed to parse http ersponse")
-	}
-
-	books := library.LibraryBooks{Total: resp.Total}
-	for _, book := range resp.Items {
+	books := library.LibraryBooks{Total: data.Total}
+	for _, book := range data.Items {
 		books.Items = append(books.Items, library.Book(book))
 	}
 
@@ -172,51 +140,30 @@ func (c *Client) GetBooks(
 }
 
 func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string) (library.ReservedBook, error) {
-	var reqReader io.Reader
-	{
-		body, err := json.Marshal(v1.TakeBookRequest{
-			BookID:    bookID,
-			LibraryID: libraryID,
-		})
-		if err != nil {
-			return library.ReservedBook{}, fmt.Errorf("failed to format json body: %w", err)
-		}
-
-		reqReader = bytes.NewBuffer(body)
-	}
-
-	url := fmt.Sprintf("http://%s/api/v1/books", c.addr)
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, reqReader)
+	body, err := json.Marshal(v1.TakeBookRequest{
+		BookID:    bookID,
+		LibraryID: libraryID,
+	})
 	if err != nil {
-		return library.ReservedBook{}, fmt.Errorf("failed to init http request: %w", err)
+		return library.ReservedBook{}, fmt.Errorf("failed to format json body: %w", err)
 	}
 
-	httpReq.Header.Add("Content-Type", "application/json")
-
-	res, err := c.conn.Do(httpReq)
+	resp, err := c.conn.R().
+		SetBody(body).
+		SetResult(&v1.TakeBookResponse{}).
+		Post("/api/v1/books")
 	if err != nil {
 		return library.ReservedBook{}, fmt.Errorf("failed to execute http request: %w", err)
 	}
 
-	if res.StatusCode != http.StatusOK {
-		return library.ReservedBook{}, fmt.Errorf("invalid status code: %d", res.StatusCode)
+	if resp.StatusCode() != http.StatusOK {
+		return library.ReservedBook{}, fmt.Errorf("invalid status code: %d", resp.StatusCode())
 	}
 
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return library.ReservedBook{}, fmt.Errorf("failed to read http response")
-	}
-
-	var resp v1.TakeBookResponse
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return library.ReservedBook{}, fmt.Errorf("failed to parse http response")
-	}
+	data := resp.Result().(*v1.TakeBookResponse)
 
 	return library.ReservedBook{
-		Book:    library.Book(resp.Book),
-		Library: library.Library(resp.Library),
+		Book:    library.Book(data.Book),
+		Library: library.Library(data.Library),
 	}, nil
 }
