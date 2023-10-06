@@ -52,6 +52,18 @@ func (c *Core) GetLibraryBooks(
 	return books, nil
 }
 
+func (c *Core) GetUserRating(
+	ctx context.Context, username string,
+) (rating.Rating, error) {
+	data, err := c.rating.GetUserRating(ctx, username)
+	if err != nil {
+		c.lg.ErrorContext(ctx, "failed to get user rating", "error", err)
+		return rating.Rating{}, fmt.Errorf("failed to get user rating: %w", err)
+	}
+
+	return data, nil
+}
+
 func (c *Core) GetUserReservations(
 	ctx context.Context, username string,
 ) ([]reservation.Reservation, error) {
