@@ -125,6 +125,7 @@ func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string
 	}
 
 	resp, err := c.conn.R().
+		SetHeader("Content-Type", "application/json").
 		SetBody(body).
 		SetResult(&v1.TakeBookResponse{}).
 		Post("/api/v1/books")

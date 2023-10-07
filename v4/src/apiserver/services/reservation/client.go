@@ -53,7 +53,7 @@ func (c *Client) GetUserReservations(
 	resp, err := c.conn.R().
 		SetHeader("X-User-Name", username).
 		SetQueryParams(q).
-		SetResult([]v1.Reservation{}).
+		SetResult(&[]v1.Reservation{}).
 		Get("/api/v1/reservations")
 
 	if err != nil {
@@ -64,10 +64,10 @@ func (c *Client) GetUserReservations(
 		return nil, fmt.Errorf("invalid status code: %d", resp.StatusCode())
 	}
 
-	data := resp.Result().([]v1.Reservation)
+	data := resp.Result().(*[]v1.Reservation)
 
 	reservs := []reservation.Reservation{}
-	for _, res := range data {
+	for _, res := range *data {
 		reservs = append(reservs, reservation.Reservation{
 			ID:        res.ID,
 			Username:  username,
@@ -96,6 +96,7 @@ func (c *Client) AddUserReservation(ctx context.Context, rsrvtn reservation.Rese
 
 	resp, err := c.conn.R().
 		SetHeader("X-User-Name", rsrvtn.Username).
+		SetHeader("Content-Type", "application/json").
 		SetBody(body).
 		SetResult(&v1.AddReservationResponse{}).
 		Post("/api/v1/reservations")

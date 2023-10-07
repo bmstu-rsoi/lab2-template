@@ -135,7 +135,6 @@ func (d *DB) TakeBookFromLibrary(
 	var libraryBook LibraryBook
 	stmt := tx.Model(&libraryBook).Clauses(clause.Returning{})
 	stmt = stmt.Where("fk_library_id = ?", libraryID).Where("fk_book_id = ?", bookID)
-	stmt = stmt.Preload("BookRef").Preload("LibraryRef")
 
 	if err := stmt.Update("available_count", gorm.Expr("available_count - 1")).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -145,6 +144,13 @@ func (d *DB) TakeBookFromLibrary(
 		tx.Rollback()
 
 		return resp, fmt.Errorf("failed to update book info: %w", err)
+	}
+
+	stmt = tx.Model(&LibraryBook{}).Preload("BookRef").Preload("LibraryRef")
+	if err := stmt.Where("id = ?", libraryBook.ID).Find(&libraryBook).Error; err != nil {
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to read book info: %w", err)
 	}
 
 	tx.Commit()
