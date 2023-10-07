@@ -12,6 +12,7 @@ import (
 
 type Core interface {
 	GetUserReservations(context.Context, string, string) ([]reservations.Reservation, error)
+	AddReservation(context.Context, string, reservations.Reservation) (string, error)
 }
 
 func InitListener(mx *echo.Echo, lg *slog.Logger, core Core) error {

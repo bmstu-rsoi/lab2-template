@@ -20,6 +20,17 @@ func New(lg *slog.Logger, probe *readiness.Probe, reservation reservations.Clien
 	return &Core{reservations: reservation}, nil
 }
 
+func (c *Core) AddReservation(
+	ctx context.Context, username string, data reservations.Reservation,
+) (string, error) {
+	id, err := c.reservations.AddReservation(ctx, username, data)
+	if err != nil {
+		return "", fmt.Errorf("failed to add user reservation: %w", err)
+	}
+
+	return id, nil
+}
+
 func (c *Core) GetUserReservations(
 	ctx context.Context, username, status string,
 ) ([]reservations.Reservation, error) {

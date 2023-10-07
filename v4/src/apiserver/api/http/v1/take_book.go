@@ -2,10 +2,12 @@ package v1
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core"
 )
 
 type TakeBookRequest struct {
@@ -43,7 +45,12 @@ func (a *api) TakeBook(c echo.Context, req TakeBookRequest) error {
 		c.Request().Context(), req.Username, req.LibraryID, req.BookID, req.End.Time,
 	)
 	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		if errors.Is(err, core.ErrInsufficientRating) {
+			status = http.StatusPreconditionFailed
+		}
+
+		return c.NoContent(status)
 	}
 
 	resp := TakeBookResponse{

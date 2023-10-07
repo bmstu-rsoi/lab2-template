@@ -130,7 +130,7 @@ func (d *DB) GetLibraryBooks(
 func (d *DB) TakeBookFromLibrary(
 	ctx context.Context, libraryID, bookID string,
 ) (resp libraries.ReservedBook, err error) {
-	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead})
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
 
 	var libraryBook LibraryBook
 	stmt := tx.Model(&libraryBook).Clauses(clause.Returning{})

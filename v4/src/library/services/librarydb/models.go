@@ -28,5 +28,5 @@ type LibraryBook struct {
 	FkLibraryID uuid.UUID
 	LibraryRef  Library `gorm:"foreignkey:FkLibraryID;references:id"`
 
-	AvailableCount uint64 `gorm:"not null"`
+	AvailableCount uint64 `gorm:"not null;check:available_count >= 0"`
 }

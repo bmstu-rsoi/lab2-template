@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -10,6 +11,10 @@ import (
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/rating"
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/reservation"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
+)
+
+var (
+	ErrInsufficientRating = errors.New("insufficient rating")
 )
 
 type Core struct {
@@ -93,7 +98,7 @@ func (c *Core) TakeBook(
 
 	if uint64(len(resvs)) >= rating.Stars {
 		c.lg.Warn("insufficient rating", "rating", rating.Stars)
-		return reservation.ReservationFullInfo{}, fmt.Errorf("insufficient rating")
+		return reservation.ReservationFullInfo{}, ErrInsufficientRating
 	}
 
 	rsvtn := reservation.Reservation{

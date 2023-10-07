@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -33,6 +34,39 @@ func New(lg *slog.Logger, cfg reservations.Config, probe *readiness.Probe) (*DB,
 	go runMigrations(lg, db, probe, cfg.MigrationInterval)
 
 	return &DB{db: db}, nil
+}
+
+func (d *DB) AddReservation(
+	ctx context.Context, username string, data reservations.Reservation,
+) (string, error) {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	bookID, err := uuid.Parse(data.BookID)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse book id: %w", err)
+	}
+
+	libraryID, err := uuid.Parse(data.LibraryID)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse library id: %w", err)
+	}
+
+	r := Reservation{
+		Username:  username,
+		BookID:    bookID,
+		LibraryID: libraryID,
+		Status:    data.Status,
+		Start:     data.Start,
+		End:       data.End,
+	}
+	if err := tx.Create(&r).Error; err != nil {
+		tx.Rollback()
+
+		return "", fmt.Errorf("failed to create reservation: %w", err)
+	}
+
+	tx.Commit()
+	return r.ReservationID.String(), nil
 }
 
 func (d *DB) GetUserReservations(
