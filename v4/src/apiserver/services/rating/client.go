@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -61,4 +62,23 @@ func (c *Client) GetUserRating(
 	rating := rating.Rating(*data)
 
 	return rating, nil
+}
+
+func (c *Client) UpdateUserRating(
+	ctx context.Context, username string, diff int,
+) error {
+	resp, err := c.conn.R().
+		SetHeader("X-User-Name", username).
+		SetQueryParam("diff", strconv.Itoa(diff)).
+		SetResult(&v1.RatingResponse{}).
+		Patch("/api/v1/rating")
+	if err != nil {
+		return fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusOK {
+		return fmt.Errorf("invalid status code: %d", resp.StatusCode())
+	}
+
+	return nil
 }

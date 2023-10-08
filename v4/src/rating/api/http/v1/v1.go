@@ -12,6 +12,7 @@ import (
 
 type Core interface {
 	GetUserRating(context.Context, string) (ratings.Rating, error)
+	UpdateUserRating(context.Context, string, int) error
 }
 
 func InitListener(mx *echo.Echo, lg *slog.Logger, core Core) error {
@@ -20,6 +21,7 @@ func InitListener(mx *echo.Echo, lg *slog.Logger, core Core) error {
 	a := api{lg: lg, core: core}
 
 	gr.GET("/rating", WrapRequest(lg, a.GetRating))
+	gr.PATCH("/rating", WrapRequest(lg, a.UpdateRating))
 
 	return nil
 }
@@ -36,6 +38,11 @@ func WrapRequest[T any](lg *slog.Logger, handler func(echo.Context, T) error) fu
 		var req T
 		if err := binder.Bind(&req, c); err != nil {
 			lg.Warn("failed to bind request", "error", err)
+			return c.String(http.StatusBadRequest, "bad request")
+		}
+
+		if err := binder.BindQueryParams(c, &req); err != nil {
+			lg.Warn("failed to bind headers", "error", err)
 			return c.String(http.StatusBadRequest, "bad request")
 		}
 

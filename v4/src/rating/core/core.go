@@ -35,3 +35,12 @@ func (c *Core) GetUserRating(
 
 	return data, nil
 }
+
+func (c *Core) UpdateUserRating(ctx context.Context, username string, diff int) error {
+	err := c.rating.UpdateUserRating(ctx, username, diff)
+	if err != nil {
+		return fmt.Errorf("failed to get user rating: %w", err)
+	}
+
+	return nil
+}

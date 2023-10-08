@@ -204,7 +204,7 @@ func (d *DB) TakeBookFromLibrary(
 	}
 
 	stmt = tx.Model(&LibraryBook{}).Preload("BookRef").Preload("LibraryRef")
-	if err := stmt.Where("id = ?", libraryBook.ID).Find(&libraryBook).Error; err != nil {
+	if err := stmt.Where("id = ?", libraryBook.ID).First(&libraryBook).Error; err != nil {
 		tx.Rollback()
 
 		return resp, fmt.Errorf("failed to read book info: %w", err)
@@ -236,7 +236,8 @@ func (d *DB) ReturnBookToLibrary(
 ) (resp libraries.Book, err error) {
 	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
 
-	stmt := tx.Model(&LibraryBook{})
+	var libraryBook LibraryBook
+	stmt := tx.Model(&libraryBook).Clauses(clause.Returning{})
 	stmt = stmt.Where("fk_library_id = ?", libraryID).Where("fk_book_id = ?", bookID)
 
 	if err := stmt.Update("available_count", gorm.Expr("available_count + 1")).Error; err != nil {
@@ -249,9 +250,8 @@ func (d *DB) ReturnBookToLibrary(
 		return resp, fmt.Errorf("failed to update book info: %w", err)
 	}
 
-	var libraryBook LibraryBook
 	stmt = tx.Model(&LibraryBook{}).Preload("BookRef")
-	if err := stmt.Where("id = ?", libraryBook.ID).Find(&libraryBook).Error; err != nil {
+	if err := stmt.Where("id = ?", libraryBook.ID).First(&libraryBook).Error; err != nil {
 		tx.Rollback()
 
 		return resp, fmt.Errorf("failed to read book info: %w", err)

@@ -39,25 +39,49 @@ func New(lg *slog.Logger, cfg ratings.Config, probe *readiness.Probe) (*DB, erro
 func (d *DB) GetUserRating(
 	ctx context.Context, username string,
 ) (ratings.Rating, error) {
-	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
 
-	var data Rating
+	data := Rating{
+		Username: username,
+		Stars:    1,
+	}
 	stmt := tx.Where("username = ?", username)
 	if err := stmt.First(&data).Error; err != nil {
-		tx.Rollback()
-
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = ratings.ErrNotFound
+			if err = tx.Create(&data).Error; err != nil {
+				tx.Rollback()
+
+				return ratings.Rating{}, fmt.Errorf("failed to create new user record: %w", err)
+			}
+
+			tx.Commit()
+
+			return ratings.Rating{Stars: data.Stars}, nil
 		}
+
+		tx.Rollback()
 
 		return ratings.Rating{}, fmt.Errorf("failed to find rating info: %w", err)
 	}
 
 	tx.Commit()
 
-	resp := ratings.Rating{
-		Stars: data.Stars,
+	return ratings.Rating{Stars: data.Stars}, nil
+}
+
+func (d *DB) UpdateUserRating(
+	ctx context.Context, username string, diff int,
+) error {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	stmt := tx.Model(&Rating{}).Where("username = ?", username)
+	if err := stmt.Update("stars", gorm.Expr("GREATEST(1, stars + ?)", diff)).Error; err != nil {
+		tx.Rollback()
+
+		return fmt.Errorf("failed to update book info: %w", err)
 	}
 
-	return resp, nil
+	tx.Commit()
+
+	return nil
 }

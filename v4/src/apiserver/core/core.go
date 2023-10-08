@@ -236,28 +236,41 @@ func (c *Core) ReturnBook(
 	status := "RETURNED"
 	if date.After(resv.End) {
 		status, bookIsOK = "EXPIRED", false
+		c.lg.Warn("reservation is expired")
 
-		// TODO: decrease stars
+		if err = c.rating.UpdateUserRating(ctx, username, -10); err != nil {
+			c.lg.Warn("failed to update user rating", "error", err)
+			return fmt.Errorf("failed to update user rating: %w", err)
+		}
 	}
 
 	err = c.reservation.SetUserReservationStatus(ctx, reservationID, status)
 	if err != nil {
+		c.lg.Warn("failed to change reservation status", "error", err)
 		return fmt.Errorf("failed to change reservation status: %w", err)
 	}
 
 	book, err := c.library.ReturnBook(ctx, resv.LibraryID, resv.BookID)
 	if err != nil {
+		c.lg.Warn("failed to obtain book info", "error", err)
 		return fmt.Errorf("failed to obtain book info: %w", err)
 	}
 
 	if condition != book.Condition {
 		bookIsOK = false
+		c.lg.Warn("book in wrong condition", "expected", book.Condition, "actual", condition)
 
-		// TODO: decrease stars
+		if err = c.rating.UpdateUserRating(ctx, username, -10); err != nil {
+			c.lg.Warn("failed to update user rating", "error", err)
+			return fmt.Errorf("failed to update user rating: %w", err)
+		}
 	}
 
 	if bookIsOK {
-		// TODO: increase stars
+		if err = c.rating.UpdateUserRating(ctx, username, 1); err != nil {
+			c.lg.Warn("failed to update user rating", "error", err)
+			return fmt.Errorf("failed to update user rating: %w", err)
+		}
 	}
 
 	return nil

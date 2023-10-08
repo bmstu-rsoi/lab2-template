@@ -9,4 +9,5 @@ type Config struct {
 
 type Client interface {
 	GetUserRating(ctx context.Context, username string) (Rating, error)
+	UpdateUserRating(ctx context.Context, username string, diff int) error
 }
