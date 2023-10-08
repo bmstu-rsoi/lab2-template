@@ -7,12 +7,12 @@ import (
 )
 
 type ReturnBookRequest struct {
-	LibraryID     string `path:"lib_id" valid:"uuidv4,required"`
-	BookID        string `path:"book_id" valid:"uuidv4,required"`
+	LibraryID     string `param:"lib_id" valid:"uuidv4,required"`
+	BookID        string `param:"book_id" valid:"uuidv4,required"`
 }
 
 type ReturnBookResponse struct {
-	Book Book `path:"book"`
+	Book Book `json:"book"`
 }
 
 func (a *api) ReturnBook(c echo.Context, req ReturnBookRequest) error {

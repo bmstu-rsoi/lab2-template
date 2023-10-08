@@ -41,3 +41,14 @@ func (c *Core) GetUserReservations(
 
 	return data, nil
 }
+
+func (c *Core) UpdateUserReservation(
+	ctx context.Context, id, status string,
+) error {
+	err := c.reservations.UpdateUserReservation(ctx, id, status)
+	if err != nil {
+		return fmt.Errorf("failed to get list of user reservations: %w", err)
+	}
+
+	return nil
+}

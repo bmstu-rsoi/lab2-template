@@ -216,7 +216,7 @@ func (c *Client) ReturnBook(ctx context.Context, libraryID string, bookID string
 		SetPathParam("book_id", bookID).
 		SetBody(body).
 		SetResult(&v1.ReturnBookResponse{}).
-		Post("/libraries/{lib_id}/books/{bookid}/return")
+		Post("/api/v1/libraries/{lib_id}/books/{book_id}/return")
 	if err != nil {
 		return library.Book{}, fmt.Errorf("failed to execute http request: %w", err)
 	}

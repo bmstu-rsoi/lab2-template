@@ -38,10 +38,12 @@ func WrapRequest[T any](lg *slog.Logger, handler func(echo.Context, T) error) fu
 			lg.Warn("failed to bind request", "error", err)
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
 		if err := binder.BindHeaders(c, &req); err != nil {
 			lg.Warn("failed to bind headers", "error", err)
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
 		if err := c.Validate(req); err != nil {
 			lg.Warn("failed to validate request", "error", err)
 			resp := ValidationErrorResponse{

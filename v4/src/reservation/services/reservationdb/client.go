@@ -101,3 +101,18 @@ func (d *DB) GetUserReservations(
 
 	return resp, nil
 }
+
+func (d *DB) UpdateUserReservation(ctx context.Context, id, status string) error {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	stmt := tx.Model(&Reservation{}).Where("reservation_uid = ?", id)
+	if err := stmt.Update("status", status).Error; err != nil {
+		tx.Rollback()
+
+		return fmt.Errorf("failed to find reservations info: %w", err)
+	}
+
+	tx.Commit()
+
+	return nil
+}

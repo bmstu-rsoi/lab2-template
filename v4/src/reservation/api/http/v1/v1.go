@@ -13,6 +13,7 @@ import (
 type Core interface {
 	GetUserReservations(context.Context, string, string) ([]reservations.Reservation, error)
 	AddReservation(context.Context, string, reservations.Reservation) (string, error)
+	UpdateUserReservation(context.Context, string, string) error
 }
 
 func InitListener(mx *echo.Echo, lg *slog.Logger, core Core) error {
@@ -22,6 +23,7 @@ func InitListener(mx *echo.Echo, lg *slog.Logger, core Core) error {
 
 	gr.POST("/reservations", WrapRequest(a.lg, a.AddReservation))
 	gr.GET("/reservations", WrapRequest(a.lg, a.GetReservations))
+	gr.PATCH("/reservations/:id", WrapRequest(a.lg, a.UpdateReservation))
 
 	return nil
 }
@@ -41,10 +43,17 @@ func WrapRequest[T any](lg *slog.Logger, handler func(echo.Context, T) error) fu
 			lg.Warn("failed to bind request", "error", err)
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
+		if err := binder.BindQueryParams(c, &req); err != nil {
+			lg.Warn("failed to bind request", "error", err)
+			return c.String(http.StatusBadRequest, "bad request")
+		}
+
 		if err := binder.BindHeaders(c, &req); err != nil {
 			lg.Warn("failed to bind headers", "error", err)
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
 		if err := c.Validate(req); err != nil {
 			lg.Warn("failed to validate request", "error", err)
 			resp := ValidationErrorResponse{

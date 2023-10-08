@@ -112,3 +112,21 @@ func (c *Client) AddUserReservation(ctx context.Context, rsrvtn reservation.Rese
 
 	return data.ID, nil
 }
+
+func (c *Client) SetUserReservationStatus(
+	ctx context.Context, id, status string,
+) error {
+	resp, err := c.conn.R().
+		SetPathParam("id", id).
+		SetQueryParam("status", status).
+		Patch("/api/v1/reservations/{id}")
+	if err != nil {
+		return fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusOK {
+		return fmt.Errorf("invalid status code: %d", resp.StatusCode())
+	}
+
+	return nil
+}

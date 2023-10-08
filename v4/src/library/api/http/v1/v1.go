@@ -25,7 +25,7 @@ func InitListener(mx *echo.Echo, core Core) error {
 
 	gr.GET("/libraries", WrapRequest(a.GetLibraries))
 	gr.GET("/libraries/:id/books", WrapRequest(a.GetLibraryBooks))
-	gr.POST("/libraries/:lib_id/books/:bookid/return", WrapRequest(a.ReturnBook))
+	gr.POST("/libraries/:lib_id/books/:book_id/return", WrapRequest(a.ReturnBook))
 
 	gr.POST("/books", WrapRequest(a.TakeBook))
 	gr.GET("/books", WrapRequest(a.GetLibraryBooks))
@@ -45,9 +45,11 @@ func WrapRequest[T any](handler func(echo.Context, T) error) func(echo.Context) 
 		if err := binder.Bind(&req, c); err != nil {
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
 		if err := binder.BindHeaders(c, &req); err != nil {
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
 		if err := c.Validate(req); err != nil {
 			resp := ValidationErrorResponse{
 				http.StatusText(http.StatusBadRequest),

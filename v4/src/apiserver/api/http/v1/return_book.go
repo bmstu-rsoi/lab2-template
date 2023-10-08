@@ -10,7 +10,7 @@ import (
 
 type ReturnBookRequest struct {
 	AuthedRequest `valid:"optional"`
-	ID            string `path:"id" valid:"uuidv4,required"`
+	ID            string `param:"id" valid:"uuidv4,required"`
 	Condition     string `json:"condition" valid:"optional"`
 	Date          Time   `json:"date" valid:"optional"`
 }

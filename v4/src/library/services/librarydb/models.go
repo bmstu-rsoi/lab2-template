@@ -23,10 +23,10 @@ type Book struct {
 type LibraryBook struct {
 	gorm.Model
 
-	FkBookID    uuid.UUID
-	BookRef     Book `gorm:"foreignkey:FkBookID;references:id"`
-	FkLibraryID uuid.UUID
-	LibraryRef  Library `gorm:"foreignkey:FkLibraryID;references:id"`
+	FkBookID    uuid.UUID `gorm:"index:idx_member"`
+	BookRef     Book      `gorm:"foreignkey:FkBookID;references:id"`
+	FkLibraryID uuid.UUID `gorm:"index:idx_member"`
+	LibraryRef  Library   `gorm:"foreignkey:FkLibraryID;references:id"`
 
 	AvailableCount uint64 `gorm:"not null;check:available_count >= 0"`
 }

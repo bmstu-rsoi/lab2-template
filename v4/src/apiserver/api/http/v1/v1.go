@@ -50,9 +50,11 @@ func WrapRequest[T any](handler func(echo.Context, T) error) func(echo.Context) 
 		if err := binder.Bind(&req, c); err != nil {
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
 		if err := binder.BindHeaders(c, &req); err != nil {
 			return c.String(http.StatusBadRequest, "bad request")
 		}
+
 		if err := c.Validate(req); err != nil {
 			resp := ValidationErrorResponse{
 				http.StatusText(http.StatusBadRequest),

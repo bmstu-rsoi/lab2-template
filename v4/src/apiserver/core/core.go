@@ -222,7 +222,7 @@ func (c *Core) ReturnBook(
 
 	var resv reservation.Reservation
 	for _, r := range resvs {
-		if r.ID == reservationID {
+		if r.ID != reservationID {
 			continue
 		}
 
@@ -233,10 +233,16 @@ func (c *Core) ReturnBook(
 		return ErrNotFound
 	}
 
+	status := "RETURNED"
 	if date.After(resv.End) {
-		bookIsOK = false
+		status, bookIsOK = "EXPIRED", false
 
 		// TODO: decrease stars
+	}
+
+	err = c.reservation.SetUserReservationStatus(ctx, reservationID, status)
+	if err != nil {
+		return fmt.Errorf("failed to change reservation status: %w", err)
 	}
 
 	book, err := c.library.ReturnBook(ctx, resv.LibraryID, resv.BookID)
