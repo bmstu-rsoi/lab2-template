@@ -200,3 +200,32 @@ func (c *Client) ObtainBook(ctx context.Context, libraryID string, bookID string
 		Library: library.Library(data.Library),
 	}, nil
 }
+
+func (c *Client) ReturnBook(ctx context.Context, libraryID string, bookID string) (library.Book, error) {
+	body, err := json.Marshal(v1.TakeBookRequest{
+		BookID:    bookID,
+		LibraryID: libraryID,
+	})
+	if err != nil {
+		return library.Book{}, fmt.Errorf("failed to format json body: %w", err)
+	}
+
+	resp, err := c.conn.R().
+		SetHeader("Content-Type", "application/json").
+		SetPathParam("lib_id", libraryID).
+		SetPathParam("book_id", bookID).
+		SetBody(body).
+		SetResult(&v1.ReturnBookResponse{}).
+		Post("/libraries/{lib_id}/books/{bookid}/return")
+	if err != nil {
+		return library.Book{}, fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusOK {
+		return library.Book{}, fmt.Errorf("invalid status code: %d", resp.StatusCode())
+	}
+
+	data := resp.Result().(*v1.ReturnBookResponse)
+
+	return library.Book(data.Book), nil
+}

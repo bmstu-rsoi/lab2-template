@@ -16,6 +16,7 @@ import (
 
 var (
 	ErrInsufficientRating = errors.New("insufficient rating")
+	ErrNotFound           = errors.New("not found")
 )
 
 type Core struct {
@@ -206,4 +207,52 @@ func (c *Core) TakeBook(
 	}
 
 	return res, nil
+}
+
+func (c *Core) ReturnBook(
+	ctx context.Context, username, reservationID, condition string, date time.Time,
+) error {
+	bookIsOK := true
+
+	resvs, err := c.reservation.GetUserReservations(ctx, username, "RENTED")
+	if err != nil {
+		c.lg.Warn("failed to get reservations", "error", err)
+		return fmt.Errorf("failed to get user reservations: %w", err)
+	}
+
+	var resv reservation.Reservation
+	for _, r := range resvs {
+		if r.ID == reservationID {
+			continue
+		}
+
+		resv = r
+	}
+
+	if resv.ID == "" {
+		return ErrNotFound
+	}
+
+	if date.After(resv.End) {
+		bookIsOK = false
+
+		// TODO: decrease stars
+	}
+
+	book, err := c.library.ReturnBook(ctx, resv.LibraryID, resv.BookID)
+	if err != nil {
+		return fmt.Errorf("failed to obtain book info: %w", err)
+	}
+
+	if condition != book.Condition {
+		bookIsOK = false
+
+		// TODO: decrease stars
+	}
+
+	if bookIsOK {
+		// TODO: increase stars
+	}
+
+	return nil
 }

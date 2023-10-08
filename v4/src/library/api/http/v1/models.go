@@ -2,17 +2,13 @@ package v1
 
 import "github.com/migregal/bmstu-iu7-ds-lab2/pkg/httpvalidator"
 
-type AuthedRequest struct {
-	Username string `header:"X-User-Name" valid:"required"`
-}
-
 type PaginatedRequest struct {
 	Page uint64 `query:"page" valid:"positive_uint,optional"`
 	Size uint64 `query:"size" valid:"range(0|100),optional"`
 }
 
 type PaginatedResponse struct {
-	Total    uint64 `json:"totalElements"`
+	Total uint64 `json:"totalElements"`
 }
 
 type ErrorResponse struct {
@@ -36,6 +32,6 @@ type Book struct {
 }
 
 type ValidationErrorResponse struct {
-	Message string `json:"message"`
+	Message string                          `json:"message"`
 	Errors  []httpvalidator.ValidationError `json:"errors"`
 }

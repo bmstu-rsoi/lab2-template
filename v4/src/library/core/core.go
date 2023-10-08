@@ -73,3 +73,12 @@ func (c *Core) TakeBook(ctx context.Context, libraryID, bookID string) (librarie
 
 	return data, nil
 }
+
+func (c *Core) ReturnBook(ctx context.Context, libraryID, bookID string) (libraries.Book, error) {
+	data, err := c.libraries.ReturnBookToLibrary(ctx, libraryID, bookID)
+	if err != nil {
+		return libraries.Book{}, fmt.Errorf("failed to return book: %w", err)
+	}
+
+	return data, nil
+}

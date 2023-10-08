@@ -9,7 +9,6 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 
 	"github.com/migregal/bmstu-iu7-ds-lab2/library/core/ports/libraries"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
@@ -189,13 +188,12 @@ func (d *DB) TakeBookFromLibrary(
 ) (resp libraries.ReservedBook, err error) {
 	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
 
-	var libraryBook LibraryBook
-	stmt := tx.Model(&libraryBook).Clauses(clause.Returning{})
+	stmt := tx.Model(&LibraryBook{})
 	stmt = stmt.Where("fk_library_id = ?", libraryID).Where("fk_book_id = ?", bookID)
 
 	if err := stmt.Update("available_count", gorm.Expr("available_count - 1")).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-
+			// TODO: add not found err
 		}
 
 		tx.Rollback()
@@ -203,6 +201,7 @@ func (d *DB) TakeBookFromLibrary(
 		return resp, fmt.Errorf("failed to update book info: %w", err)
 	}
 
+	var libraryBook LibraryBook
 	stmt = tx.Model(&LibraryBook{}).Preload("BookRef").Preload("LibraryRef")
 	if err := stmt.Where("id = ?", libraryBook.ID).Find(&libraryBook).Error; err != nil {
 		tx.Rollback()
@@ -227,6 +226,45 @@ func (d *DB) TakeBookFromLibrary(
 			Address: libraryBook.LibraryRef.Address,
 			City:    libraryBook.LibraryRef.City,
 		},
+	}
+	return resp, nil
+}
+
+func (d *DB) ReturnBookToLibrary(
+	ctx context.Context, libraryID, bookID string,
+) (resp libraries.Book, err error) {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
+
+	stmt := tx.Model(&LibraryBook{})
+	stmt = stmt.Where("fk_library_id = ?", libraryID).Where("fk_book_id = ?", bookID)
+
+	if err := stmt.Update("available_count", gorm.Expr("available_count + 1")).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// TODO: add not found err
+		}
+
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to update book info: %w", err)
+	}
+
+	var libraryBook LibraryBook
+	stmt = tx.Model(&LibraryBook{}).Preload("BookRef")
+	if err := stmt.Where("id = ?", libraryBook.ID).Find(&libraryBook).Error; err != nil {
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to read book info: %w", err)
+	}
+
+	tx.Commit()
+
+	resp = libraries.Book{
+		ID:        libraryBook.BookRef.ID.String(),
+		Name:      libraryBook.BookRef.Name,
+		Author:    libraryBook.BookRef.Author,
+		Genre:     libraryBook.BookRef.Genre,
+		Condition: libraryBook.BookRef.Condition,
+		Available: libraryBook.AvailableCount,
 	}
 	return resp, nil
 }

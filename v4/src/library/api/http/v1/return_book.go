@@ -2,24 +2,28 @@ package v1
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
 type ReturnBookRequest struct {
-	AuthedRequest `valid:"optional"`
-	ID            string    `path:"id" valid:"uuidv4,required"`
-	Condition     string    `json:"condition" valid:"optional"`
-	Date          time.Time `json:"date" valid:"optional"`
+	LibraryID     string `path:"lib_id" valid:"uuidv4,required"`
+	BookID        string `path:"book_id" valid:"uuidv4,required"`
 }
 
-func (a *api) ReturnBook(c echo.Context, req TakeBookRequest) error {
-	if false {
-		resp := ErrorResponse{}
+type ReturnBookResponse struct {
+	Book Book `path:"book"`
+}
 
-		return c.JSON(http.StatusNotFound, &resp)
+func (a *api) ReturnBook(c echo.Context, req ReturnBookRequest) error {
+	data, err := a.core.ReturnBook(c.Request().Context(), req.LibraryID, req.BookID)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	resp := ReturnBookResponse{
+		Book: Book(data),
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }

@@ -18,6 +18,7 @@ type Core interface {
 	GetUserRating(ctx context.Context, username string) (rating.Rating, error)
 	GetUserReservations(context.Context, string) ([]reservation.ReservationFullInfo, error)
 	TakeBook(ctx context.Context, usename, libraryID, bookID string, end time.Time) (reservation.ReservationFullInfo, error)
+	ReturnBook(ctx context.Context, username, reservationID, condition string, date time.Time) error
 }
 
 func InitListener(mx *echo.Echo, core Core) error {

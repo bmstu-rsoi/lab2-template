@@ -15,6 +15,7 @@ type Core interface {
 	GetLibraries(context.Context, string, uint64, uint64) (libraries.Libraries, error)
 	GetLibrariesByIDs(context.Context, []string) (libraries.Libraries, error)
 	TakeBook(context.Context, string, string) (libraries.ReservedBook, error)
+	ReturnBook(context.Context, string, string) (libraries.Book, error)
 }
 
 func InitListener(mx *echo.Echo, core Core) error {
@@ -24,6 +25,7 @@ func InitListener(mx *echo.Echo, core Core) error {
 
 	gr.GET("/libraries", WrapRequest(a.GetLibraries))
 	gr.GET("/libraries/:id/books", WrapRequest(a.GetLibraryBooks))
+	gr.POST("/libraries/:lib_id/books/:bookid/return", WrapRequest(a.ReturnBook))
 
 	gr.POST("/books", WrapRequest(a.TakeBook))
 	gr.GET("/books", WrapRequest(a.GetLibraryBooks))
