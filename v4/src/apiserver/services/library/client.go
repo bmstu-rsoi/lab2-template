@@ -71,12 +71,40 @@ func (c *Client) GetLibraries(
 
 	data := resp.Result().(*v1.LibrariesResponse)
 
-	books := library.Libraries{Total: data.Total}
+	libraries := library.Libraries{Total: data.Total}
 	for _, book := range data.Items {
-		books.Items = append(books.Items, library.Library(book))
+		libraries.Items = append(libraries.Items, library.Library(book))
 	}
 
-	return books, nil
+	return libraries, nil
+}
+
+func (c *Client) GetLibrariesByIDs(ctx context.Context, ids []string) (library.Libraries, error) {
+	id, err := json.Marshal(ids)
+	if err != nil {
+		return library.Libraries{}, fmt.Errorf("failed to marshal data: %w", err)
+	}
+
+	resp, err := c.conn.R().
+		SetQueryParam("ids", string(id)).
+		SetResult(&v1.LibrariesResponse{}).
+		Get("/api/v1/libraries")
+	if err != nil {
+		return library.Libraries{}, fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusOK {
+		return library.Libraries{}, fmt.Errorf("invalid status code: %d", resp.StatusCode())
+	}
+
+	data := resp.Result().(*v1.LibrariesResponse)
+
+	libraries := library.Libraries{Total: data.Total}
+	for _, book := range data.Items {
+		libraries.Items = append(libraries.Items, library.Library(book))
+	}
+
+	return libraries, nil
 }
 
 func (c *Client) GetBooks(
@@ -97,6 +125,34 @@ func (c *Client) GetBooks(
 		SetPathParam("library_id", libraryID).
 		SetResult(&v1.BooksResponse{}).
 		Get("/api/v1/libraries/{library_id}/books")
+	if err != nil {
+		return library.LibraryBooks{}, fmt.Errorf("failed to execute http request: %w", err)
+	}
+
+	if resp.StatusCode() != http.StatusOK {
+		return library.LibraryBooks{}, fmt.Errorf("invalid status code: %d", resp.StatusCode())
+	}
+
+	data := resp.Result().(*v1.BooksResponse)
+
+	books := library.LibraryBooks{Total: data.Total}
+	for _, book := range data.Items {
+		books.Items = append(books.Items, library.Book(book))
+	}
+
+	return books, nil
+}
+
+func (c *Client) GetBooksByIDs(ctx context.Context, ids []string) (library.LibraryBooks, error) {
+	id, err := json.Marshal(ids)
+	if err != nil {
+		return library.LibraryBooks{}, fmt.Errorf("failed to marshal data: %w", err)
+	}
+
+	resp, err := c.conn.R().
+		SetQueryParam("ids", string(id)).
+		SetResult(&v1.BooksResponse{}).
+		Get("/api/v1/books")
 	if err != nil {
 		return library.LibraryBooks{}, fmt.Errorf("failed to execute http request: %w", err)
 	}

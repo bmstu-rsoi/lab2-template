@@ -16,7 +16,7 @@ type Core interface {
 	GetLibraries(context.Context, string, uint64, uint64) (library.Libraries, error)
 	GetLibraryBooks(context.Context, string, bool, uint64, uint64) (library.LibraryBooks, error)
 	GetUserRating(ctx context.Context, username string) (rating.Rating, error)
-	GetUserReservations(context.Context, string) ([]reservation.Reservation, error)
+	GetUserReservations(context.Context, string) ([]reservation.ReservationFullInfo, error)
 	TakeBook(ctx context.Context, usename, libraryID, bookID string, end time.Time) (reservation.ReservationFullInfo, error)
 }
 

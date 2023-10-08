@@ -81,6 +81,33 @@ func (d *DB) GetLibraries(
 	return resp, nil
 }
 
+func (d *DB) GetLibrariesByIDs(
+	ctx context.Context, ids []string,
+) (resp libraries.Libraries, err error) {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
+
+	var libs []Library
+	if err := tx.Where("id in ?", ids).Find(&libs).Error; err != nil {
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to find libraries info: %w", err)
+	}
+
+	resp.Total = uint64(len(libs))
+	for _, lib := range libs {
+		resp.Items = append(resp.Items, libraries.Library{
+			ID:      lib.ID.String(),
+			Name:    lib.Name,
+			Address: lib.Address,
+			City:    lib.City,
+		})
+	}
+
+	tx.Commit()
+
+	return resp, nil
+}
+
 func (d *DB) GetLibraryBooks(
 	ctx context.Context, libraryID string, showAll bool, page uint64, size uint64,
 ) (resp libraries.LibraryBooks, err error) {
@@ -119,6 +146,36 @@ func (d *DB) GetLibraryBooks(
 			Genre:     book.BookRef.Genre,
 			Condition: book.BookRef.Condition,
 			Available: book.AvailableCount,
+		})
+	}
+
+	tx.Commit()
+
+	return resp, nil
+}
+
+func (d *DB) GetLibraryBooksByIDs(
+	ctx context.Context, ids []string,
+) (resp libraries.LibraryBooks, err error) {
+	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelRepeatableRead, ReadOnly: true})
+
+	var books []Book
+
+	stmt := tx.Model(&Book{}).Where("id in ?", ids)
+	if err := stmt.Find(&books).Error; err != nil {
+		tx.Rollback()
+
+		return resp, fmt.Errorf("failed to select library books info: %w", err)
+	}
+
+	resp.Total = uint64(len(books))
+	for _, book := range books {
+		resp.Items = append(resp.Items, libraries.Book{
+			ID:        book.ID.String(),
+			Name:      book.Name,
+			Author:    book.Author,
+			Genre:     book.Genre,
+			Condition: book.Condition,
 		})
 	}
 

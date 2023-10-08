@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/migregal/bmstu-iu7-ds-lab2/apiserver/core/ports/library"
@@ -71,14 +72,86 @@ func (c *Core) GetUserRating(
 
 func (c *Core) GetUserReservations(
 	ctx context.Context, username string,
-) ([]reservation.Reservation, error) {
+) ([]reservation.ReservationFullInfo, error) {
 	resvs, err := c.reservation.GetUserReservations(ctx, username, "")
 	if err != nil {
 		c.lg.ErrorContext(ctx, "failed to get list of user reservations", "error", err)
 		return nil, fmt.Errorf("failed to get list of user reservations: %w", err)
 	}
 
-	return resvs, nil
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	var (
+		errs      = make(chan error, 2)
+		libraries library.Libraries
+		books     library.LibraryBooks
+	)
+
+	go func() {
+		defer wg.Done()
+
+		ids := make([]string, 0, len(resvs))
+		for _, resv := range resvs {
+			ids = append(ids, resv.BookID)
+		}
+
+		var err error
+		if books, err = c.library.GetBooksByIDs(ctx, ids); err != nil {
+			errs <- err
+			return
+		}
+	}()
+	go func() {
+		defer wg.Done()
+
+		ids := make([]string, 0, len(resvs))
+		for _, resv := range resvs {
+			ids = append(ids, resv.LibraryID)
+		}
+
+		var err error
+		if libraries, err = c.library.GetLibrariesByIDs(ctx, ids); err != nil {
+			errs <- err
+			return
+		}
+	}()
+
+	wg.Wait()
+
+	select {
+	case err = <-errs:
+		c.lg.ErrorContext(ctx, "failed to get list of user books", "error", err)
+		return nil, fmt.Errorf("failed to get list of user books: %w", err)
+	default:
+	}
+
+	data := make([]reservation.ReservationFullInfo, 0, len(resvs))
+	for _, resv := range resvs {
+		info := reservation.ReservationFullInfo{
+			ID:       resv.ID,
+			Username: username,
+			Status:   resv.Status,
+			Start:    resv.Start,
+			End:      resv.End,
+		}
+		for _, library := range libraries.Items {
+			if resv.LibraryID == library.ID {
+				info.ReservedBook.Library = library
+				break
+			}
+		}
+		for _, book := range books.Items {
+			if resv.BookID == book.ID {
+				info.ReservedBook.Book = book
+				break
+			}
+		}
+
+		data = append(data, info)
+	}
+
+	return data, nil
 }
 
 func (c *Core) TakeBook(
@@ -123,6 +196,7 @@ func (c *Core) TakeBook(
 	}
 
 	res := reservation.ReservationFullInfo{
+		ID:           rsvtn.ID,
 		Username:     rsvtn.Username,
 		Status:       rsvtn.Status,
 		Start:        rsvtn.Start,
