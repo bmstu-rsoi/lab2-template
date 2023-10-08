@@ -9,6 +9,7 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/migregal/bmstu-iu7-ds-lab2/library/core/ports/libraries"
 	"github.com/migregal/bmstu-iu7-ds-lab2/pkg/readiness"
@@ -188,7 +189,8 @@ func (d *DB) TakeBookFromLibrary(
 ) (resp libraries.ReservedBook, err error) {
 	tx := d.db.Begin(&sql.TxOptions{Isolation: sql.LevelSerializable})
 
-	stmt := tx.Model(&LibraryBook{})
+	var libraryBook LibraryBook
+	stmt := tx.Model(&libraryBook).Clauses(clause.Returning{})
 	stmt = stmt.Where("fk_library_id = ?", libraryID).Where("fk_book_id = ?", bookID)
 
 	if err := stmt.Update("available_count", gorm.Expr("available_count - 1")).Error; err != nil {
@@ -201,7 +203,6 @@ func (d *DB) TakeBookFromLibrary(
 		return resp, fmt.Errorf("failed to update book info: %w", err)
 	}
 
-	var libraryBook LibraryBook
 	stmt = tx.Model(&LibraryBook{}).Preload("BookRef").Preload("LibraryRef")
 	if err := stmt.Where("id = ?", libraryBook.ID).Find(&libraryBook).Error; err != nil {
 		tx.Rollback()
