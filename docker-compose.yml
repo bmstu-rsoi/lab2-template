@@ -14,7 +14,51 @@ services:
     ports:
       - "5432:5432"
 
-# TODO добавить сервисы
+  ticket-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.ticket-service
+    environment:
+      PORT: "8070"
+    ports:
+      - "8070:8070"
+    depends_on:
+      - postgres
+
+  flight-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.flight-service
+    environment:
+      PORT: "8060"
+    ports:
+      - "8060:8060"
+    depends_on:
+      - postgres
+
+  bonus-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.bonus-service
+    environment:
+      PORT: "8050"
+    ports:
+      - "8050:8050"
+    depends_on:
+      - postgres
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway-service
+    environment:
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ticket-service
+      - flight-service
+      - bonus-service
 
 volumes:
   db-data:

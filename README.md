@@ -17,19 +17,14 @@
    протоколы, например grpc, но это требуется согласовать с преподавателем.
 3. Выделить **Gateway Service** как единую точку входа и межсервисной коммуникации. Горизонтальные запросы между
    сервисами делать _нельзя_.
-4. На каждом сервисе сделать специальный endpoint `GET /manage/health`, отдающий 200 ОК, он будет использоваться для
-   проверки доступности сервиса (в [Github Actions](.github/workflows/classroom.yml) в скрипте проверки готовности всех
-   сервисов [wait-script.sh](scripts/wait-script.sh).
-   ```shell
-   "$path"/wait-for.sh -t 120 "http://localhost:$port/manage/health" -- echo "Host localhost:$port is active"
-   ```
-6. Код хранить на Github, для сборки использовать Github Actions.
-7. Gateway Service должен запускаться на порту 8080, остальные сервисы запускать на портах 8050, 8060, 8070.
-8. Каждый сервис должен быть завернут в docker.
-9. В [docker-compose.yml](docker-compose.yml) прописать сборку и запуск docker контейнеров.
-10. В [classroom.yml](.github/workflows/classroom.yml) дописать шаги на сборку и прогон unit-тестов.
-11. Для автоматических прогонов тестов в файле [autograding.json](.github/classroom/autograding.json)
-    и [classroom.yml](.github/workflows/classroom.yml) заменить `<variant>` на ваш вариант.
+4. Код хранить на Github, для сборки использовать Github Actions.
+5. Gateway Service должен запускаться на порту 8080, остальные сервисы запускать на портах 8050, 8060, 8070.
+6. Каждый сервис должен быть завернут в docker.
+7. В [docker-compose.yml](docker-compose.yml) прописать сборку и запуск docker контейнеров.
+8. В [classroom.yml](.github/workflows/classroom.yml) дописать шаги на сборку, прогон unit-тестов и деплой каждого
+   сервиса на heroku.
+9. Для автоматических прогонов тестов в файле [autograding.json](.github/classroom/autograding.json)
+   и [classroom.yml](.github/workflows/classroom.yml) заменить `<variant>` на ваш вариант.
 
 ### Пояснения
 

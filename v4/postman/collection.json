@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "495af3e4-e965-4520-8005-8828e3110b9b",
-		"name": "[rsoi][lab2] Library System",
+		"name": "[rsoi] Library System",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -238,7 +238,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"page\": 1,\n    \"pageSize\": 1,\n    \"totalElements\": 1,\n    \"items\": [\n        {\n            \"bookUid\": \"f7cdc58f-2caf-4b15-9727-f89dcc629b27\",\n            \"name\": \"Краткий курс C++ в 7 томах\",\n            \"author\": \"Бьерн Страуструп\",\n            \"genre\": \"Научная фантастика\",\n            \"condition\": \"EXCELLENT\",\n            \"availableCount\": 1\n        }\n    ]\n}"
+							"body": "{\n    \"page\": 1,\n    \"pageSize\": 1,\n    \"totalElements\": 1,\n    \"items\": [\n        {\n            \"bookUid\": \"f7cdc58f-2caf-4b15-9727-f89dcc629b27\",\n            \"name\": \"Краткий курс C++ в 7 томах\",\n            \"author\": \"Бьерн Страуструп\",\n            \"genre\": \"Научная фантастика\",\n            \"condition\": \"EXCELLENT\",\n            \"avaiblableCount\": 1\n        }\n    ]\n}"
 						}
 					]
 				},

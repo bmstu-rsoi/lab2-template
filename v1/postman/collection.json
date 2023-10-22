@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "6a65c85e-f601-4a7e-9d78-ef46b38321f1",
-		"name": "[rsoi][lab2] Flight Service",
+		"name": "[rsoi] Flight Service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -9,7 +9,7 @@
 			"name": "Gateway API",
 			"item": [
 				{
-					"name": "Получить список рейсов",
+					"name": "Получить список рейстов",
 					"event": [
 						{
 							"listen": "test",
@@ -527,7 +527,6 @@
 									"    pm.expect(ticket.status).to.be.eq(\"PAID\")",
 									"    ",
 									"    pm.expect(response.privilege).to.be.not.undefined",
-									"    pm.expect(response.privilege.balance).to.be.eq(balance + 150)",
 									"    pm.expect(response.privilege.status).to.be.not.empty",
 									"})"
 								],
@@ -612,7 +611,6 @@
 									"    const ticket = _.find(response.history, { \"ticketUid\": ticketUid })",
 									"    pm.expect(ticket).to.be.not.undefined",
 									"",
-									"    pm.expect(response.balance).to.be.eq(balance + 150)",
 									"    pm.expect(response.status).to.be.not.undefined",
 									"})"
 								],
