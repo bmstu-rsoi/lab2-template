@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - lab2
   pull_request:
     branches:
       - master
