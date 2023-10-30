@@ -50,6 +50,11 @@ namespace Gateway.Controllers
             return response;
         }
 
+        /// <summary>
+        /// Возвращает информацию о пользователе
+        /// </summary>
+        /// <returns>Запись о пользователе и его статус лояльности  </returns>
+        /// <response code="200" cref="Person">Работает</response>
         [HttpGet("me")]
         public async Task<UserInfoResponse?> GetUserInfoByUsername(
         [FromHeader(Name = "X-User-Name")] string xUserName)
@@ -101,6 +106,11 @@ namespace Gateway.Controllers
             return response;
         }
 
+        /// <summary>
+        /// Получить информацию о бронировании
+        /// </summary>
+        /// <returns>Записи о всех бронях с отелями и оплатами </returns>
+        /// <response code="200" cref="Person">Работает</response>
         [HttpGet("reservations")]
         public async Task<List<UserReservationInfo>?> GetReservationsInfoByUsername(
         [FromHeader(Name = "X-User-Name")] string xUserName)
