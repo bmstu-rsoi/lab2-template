@@ -3,7 +3,7 @@ services:
   postgres:
     image: library/postgres:13
     container_name: postgres
-    restart: on-failure
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: "postgres"
@@ -13,8 +13,113 @@ services:
       - ./postgres/:/docker-entrypoint-initdb.d/
     ports:
       - "5432:5432"
-
-# TODO добавить сервисы
+    networks:
+      - db-local
+      
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d postgres -U postgres"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+  
+  loyalty:
+    build:
+      context: ./src/lab2/Loyalty Service/
+      dockerfile: Dockerfile
+    restart: always
+    container_name: loyalty
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8050:8050"
+    links:
+      - postgres
+    environment:
+      DATABASE_HOST: postgres
+    networks:
+      - db-local
+      - loyalty-local
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8050/manage/health"]
+      interval: 5s
+      timeout: 10s
+      
+  payment:
+    build:
+      context: ./src/lab2/Payment Service/
+      dockerfile: Dockerfile
+    restart: always
+    container_name: payment
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8060:8060"
+    links:
+      - postgres
+    environment:
+      DATABASE_HOST: postgres
+    networks:
+      - db-local
+      - payment-local
+    
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8060/manage/health"]
+      interval: 5s
+      timeout: 10s
+  reservation:
+    build:
+      context: ./src/lab2/Reservation Service/
+      dockerfile: Dockerfile
+    restart: always
+    container_name: reservation
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8070:8070"
+    links:
+      - postgres
+    environment:
+      DATABASE_HOST: postgres
+    networks:
+      - db-local
+      - reservation-local
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8070/manage/health"]
+      interval: 5s
+      timeout: 10s
+      
+  gateway:
+    build:
+      context: ./src/lab2/Gateway/
+      dockerfile: Dockerfile
+    restart: always
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - reservation
+      - payment
+      - loyalty
+    networks:
+      - loyalty-local
+      - payment-local
+      - reservation-local
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/manage/health"]
+      interval: 5s
+      timeout: 10s
+    
+  
+networks:
+  loyalty-local:
+  payment-local:
+  reservation-local:
+  db-local:
+    driver: bridge
 
 volumes:
   db-data:
