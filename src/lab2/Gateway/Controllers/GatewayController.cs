@@ -11,7 +11,7 @@ using System;
 namespace Gateway.Controllers
 {
     [ApiController]
-    [Route("/")]
+    [Route("/api/v1/")]
     public class GatewayController : ControllerBase
     {
         private readonly ILogger<GatewayController> _logger;
@@ -29,18 +29,19 @@ namespace Gateway.Controllers
         }
 
         /// <summary>
-        /// Проверяет состояние сервера
+        /// Проверяет жив ли ещё сервис
         /// </summary>
-        /// <returns>Жив ли сервис</returns>
-        /// <response code="200" cref="Person">Сервис жив</response>
+        /// <returns>Если сервис жив возвращает 200 </returns>
+        /// <response code="200" cref="Person">Работает</response>
         [IgnoreAntiforgeryToken]
-        [HttpGet("manage/health")]
+        [HttpGet("/manage/health")]
         public async Task<ActionResult> HealthCheck()
         {
             return Ok();
         }
 
-        [HttpGet("api/v1/hotels")]
+    
+        [HttpGet("hotels")]
         public async Task<PaginationResponse<IEnumerable<Hotels>>?> GetAllHotels(
         [FromQuery] int? page,
         [FromQuery] int? size)
@@ -49,7 +50,7 @@ namespace Gateway.Controllers
             return response;
         }
 
-        [HttpGet("api/v1/me")]
+        [HttpGet("me")]
         public async Task<UserInfoResponse?> GetUserInfoByUsername(
         [FromHeader(Name = "X-User-Name")] string xUserName)
         {
@@ -100,7 +101,7 @@ namespace Gateway.Controllers
             return response;
         }
 
-        [HttpGet("api/v1/reservations")]
+        [HttpGet("reservations")]
         public async Task<List<UserReservationInfo>?> GetReservationsInfoByUsername(
         [FromHeader(Name = "X-User-Name")] string xUserName)
         {
@@ -144,7 +145,7 @@ namespace Gateway.Controllers
             return response;
         }
 
-        [HttpGet("api/v1/reservations/{reservationsUid}")]
+        [HttpGet("reservations/{reservationsUid}")]
         public async Task<ActionResult<UserReservationInfo>?> GetReservationsInfoByUsername(
         [FromRoute] Guid reservationsUid,
         [FromHeader(Name = "X-User-Name")] string xUserName)
@@ -189,7 +190,7 @@ namespace Gateway.Controllers
             return response;
         }
 
-        [HttpPost("api/v1/reservations")]
+        [HttpPost("reservations")]
         public async Task<ActionResult<CreateReservationResponse?>> CreateReservation(
         [FromHeader(Name = "X-User-Name")] string xUserName,
         [FromBody] CreateReservationRequest request)
@@ -263,7 +264,7 @@ namespace Gateway.Controllers
             return Ok(reservationResponse);
         }
 
-        [HttpDelete("api/v1/reservations/{reservationsUid}")]
+        [HttpDelete("reservations/{reservationsUid}")]
         public async Task<ActionResult> DeleteReservationsByUid(
         [FromRoute] Guid reservationsUid,
         [FromHeader(Name = "X-User-Name")] string xUserName)
@@ -287,7 +288,7 @@ namespace Gateway.Controllers
             return Ok(null);
         }
 
-        [HttpGet("api/v1/loyalty")]
+        [HttpGet("loyalty")]
         public async Task<LoyaltyInfoResponse?> GetLoyaltyInfoByUsername(
         [FromHeader(Name = "X-User-Name")] string xUserName)
         {
